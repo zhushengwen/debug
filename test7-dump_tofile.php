@@ -7,8 +7,6 @@
 // - you want to debug in more than one place through the request.
 
 include_once './lib/dump.php';
-
-
 function test5()
 {
 	include './testdata/test0.php';
