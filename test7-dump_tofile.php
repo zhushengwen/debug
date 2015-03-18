@@ -8,6 +8,7 @@
 
 include_once './lib/dump.php';
 
+
 function test5()
 {
 	include './testdata/test0.php';
