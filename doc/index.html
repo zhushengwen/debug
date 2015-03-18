@@ -1,0 +1,312 @@
+<h1>PHP debug tools</h1>
+
+<h2>Download</h2>
+<div>Version: 1.03: <a href="http://www.gosu.pl/debug/debug.zip?ver=1.03">debug.zip</a> [276 KB] [2009-12-29]
+	(see <a href="#changelog">changelog</a>)</div>
+<div>License: BSD revised (free for any use)</div>
+<div>Author: Cezary Tomczak [cagret at gmail.com]</div>
+<div>Subscribe to new releases: <a href="http://freshmeat.net/projects/php-debug-tools/">http://freshmeat.net/projects/php-debug-tools/</a></div>
+
+<h2>Examples (with screenshots)</h2>
+<ul>
+	<li><a href="#debug_trace">1. Debug script trace</a> (dependency: xdebug php extension)</li>
+	<li><a href="#debug_error">2. Debug errors</a></li>
+	<li><a href="#debug_debug">3. Debug using debug() function</a></li>
+	<li><a href="#debug_dump">3. Debug using dump(), dump_tofile() functions</a></li>
+	<li><a href="#debug_queries">4. Debug database queries</a></li>
+</ul>
+
+<a name="debug_trace"></a>
+<h2>1. Debug script trace</h2>
+
+<h3>Xdebug install</h3>
+<p>
+	Debug script trace tool requires installing xdebug php extension.<br>
+	How to install docs: <a href="http://www.xdebug.org/docs/install">http://www.xdebug.org/docs/install</a>
+</p>
+<p>
+	Example installation (for windows, tested with xdebug version 2.0.4, php version 5.2.8, nts non-thread safe):
+	<ol>
+		<li>Download xdebug from: <a href="http://www.xdebug.org/download.php">http://www.xdebug.org/download.php</a></li>
+		<li>Copy dll to php extensions directory, for example: C:/php/ext/php_xdebug-2.0.4-5.2.8-nts.dll</li>
+		<li>Add this directives to php.ini:
+			<pre>zend_extension = "C:/php/ext/php_xdebug-2.0.4-5.2.8-nts.dll"
+xdebug.collect_includes = Off
+xdebug.default_enable = Off
+xdebug.dump_globals = Off
+xdebug.dump_once = Off
+xdebug.extended_info = Off
+</pre>
+		This example is for non-thread safe version. For the thread safe version change "zend_extension" to "zend_extension_ts".
+		</li>
+	</ol>
+</p>
+
+<h3>Input</h3>
+
+<pre>&lt;?php
+include './auto_prepend.php';
+echo '&lt;h1&gt;test3: trace&lt;/h1&gt;';
+function test1()
+{
+	test2();
+}
+function test2()
+{
+	for ($i = 0; $i < 100; $i++) {
+		$s = substr('', 0, 1);
+	}
+}
+test1();
+include './auto_append.php';
+?&gt;</pre>
+
+<h3>Output</h3>
+
+<p>
+	In the bottom-right corner will be displayed a debug console, which shows execution time
+	of php script along with used memory. The "start" link enables xdebug session, after
+	the session is enabled you have to click "xdebug-trace" link to view the script trace
+	in a popup window.
+</p>
+
+<h4>Step 1 - click "start" to enable xdebug session</h4>
+<img src="screenshots/test3-trace-a.png" width="533" height="206" alt="php debug tools - trace example - debug console start">
+
+<h4>Step 2 - click "xdebug-trace" to open popup window</h4>
+<img src="screenshots/test3-trace-b.png" width="534" height="206" alt="php debug tools - trace example - debug console open popup window">
+
+<h4>Step 3 - xdebug-trace popup window</h4>
+<img src="screenshots/test3-trace-c.png" width="608" height="287" alt="php debug tools - xdebug trace popup window">
+
+<h3>More info</h3>
+
+<h4>Including debug console in all scripts on localhost</h4>
+
+<p>You can set php.ini directives "auto_prepend_file" & "auto_append_file" to point to auto_prepend.php & auto_append.php files, and you will see the debug console in each script that you are running on your localhost machine.</p>
+
+Using php.ini:
+<pre>
+auto_prepend_file = C:/public_html/debug/auto_prepend.php
+auto_append_file = C:/public_html/debug/auto_append.php
+</pre>
+
+Using .htaccess:
+<pre>
+php_value auto_prepend_file C:/public_html/debug/auto_prepend.php
+php_value auto_append_file C:/public_html/debug/auto_append.php
+</pre>
+
+<h4>Debug console & ajax requests</h4>
+
+<p>
+	If your scripts do some ajax requests, there might be some issues, because debug console
+	might be displayed more than once, to avoid it, some simple modifications to auto_prepend.php & auto_append.php might be required. For example in your ajax scripts define some constant:
+</p>
+<pre>define('AJAX_REQUEST', 1);</pre>
+<p>
+	And in auto_append.php:
+</p>
+<pre>debug_stop();
+if (!(defined('AJAX_REQUEST') && AJAX_REQUEST)) {
+	echo debug_console();
+}</pre>
+<p>
+	But that still leaves some issues, because debug_start() has been called,
+	and xdebug-trace data file will be overwritten, so when you click "xdebug-trace" popup
+	you will see the trace of one of ajax requests, and not the original base-request. To solve this issue completely, you will have to copy the code from auto_*.php files into your projects index.php controller (or something) and detect ajax requests and disable debugging for such requests.
+</p>
+<p>
+	If you're using debug console through php.ini, you might want to enable/disable it for custom sites/urls, you will have to write a code like this in auto_prepend.php, auto_append.php:
+</p>
+auto_prepend.php:
+<pre>define('ENABLE_DEBUG', in_array($_SERVER['SERVER_NAME'], array('test.dev', 'www.test.dev', 'localhost')));
+if (ENABLE_DEBUG) {
+	require ...
+	define ...
+	...
+	debug_start();
+}
+</pre>
+auto_append.php:
+<pre>
+if (ENABLE_DEBUG) {
+	debug_stop();
+	echo debug_console();
+}
+</pre>
+
+<h4>Possible problems when sending ETags / caching content</h4>
+<p>
+	A strange behavior might appear (starting/stopping xdebug session might not work) if you're sending ETag headers and including auto_prepend.php through	php.ini. It happens because debug console html is sent after the script execution,
+	so the content is different then the ETag suggests. Solution: implement including debug console
+	in your scripts controller or disable sending etags on localhost by using for example such condition: if ('127.0.0.1' == $_SERVER['SERVER_ADDR'] && '127.0.0.1' == $_SERVER['REMOTE_ADDR']) { return; // do not send etag }
+</p>
+
+<a name="debug_error"></a>
+<h2>2. Debug errors</h2>
+
+<h3>Input</h3>
+<pre>&lt;?php
+require './lib/debug.php';
+function test($a, $b)
+{
+	echo $asd;
+}
+test(10, 'abc');
+?&gt;</pre>
+
+<h3>Output</h3>
+
+<img src="screenshots/test2-error.png" width="554" height="458" alt="php debug tools - debug errors">
+
+<a name="debug_debug"></a>
+<h2>3. Debug using debug() function</h2>
+
+<h3>Input</h3>
+<pre>&lt;?php
+require './lib/debug.php';
+function test($args)
+{
+	test_nested($args);
+}
+function test_nested($args)
+{
+	debug($args);
+	// or: debug(get_defined_vars());
+	// or: debug();
+}
+test(array('id'=>123, 'str'=>'test'));
+?&gt;</pre>
+
+<h3>Output</h3>
+<img src="screenshots/test1-debug.png" width="581" height="530" alt="php debug tools - debug using debug() function">
+
+<a name="debug_dump"></a>
+<h2>4. Debug using dump(), dump_tofile() functions</h2>
+
+<p>
+	This function is a light version of debug(), with just basic features and a light interface.
+</p>
+
+<h3>Input</h3>
+<pre>&lt;?php
+
+include_once './lib/dump.php';
+
+function test5()
+{
+	include './testdata/test0.php';
+	$test = array('int'=>1, 'float'=>2.0, 'float2'=>2.1);
+	dump($test, $_SERVER);
+}
+function test1() { test2(); }
+function test2() { test3(); }
+function test3() { test4(); }
+function test4() { test5(); }
+
+test1();
+
+?&gt;</pre>
+
+<h3>Output</h3>
+<img src="screenshots/test6-dump.png" width="817" height="542" alt="php debug tools - debug using dump(), dump_tofile() functions">
+
+<h3>dump_tofile()</h3>
+<p>
+	This function is useful while debugging when:
+</p>
+<ul>
+	<li>you don't want to stop the script execution.</li>
+	<li>you can't display data, because for example it is an ajax request.</li>
+	<li>you want to debug in more than one place through the request.</li>
+</ul>
+<p>
+	Example: debug/test7-dump_tofile.php
+</p>
+
+<a name="debug_queries"></a>
+<h2>5. Debug database queries</h2>
+
+<h3>Input</h3>
+
+<pre>&lt;?php
+include './auto_prepend.php';
+
+include './lib/db-mysql.php';
+db_connect(array(
+	'host' => 'localhost',
+	'user' => 'root',
+	'pass' => 'toor',
+	'dbname' => 'test',
+	'charset' => 'latin2'
+));
+db_query('CREATE TABLE IF NOT EXISTS testdebug (id int PRIMARY KEY)');
+db_query('DELETE FROM testdebug WHERE 1=1');
+db_insert('testdebug', array('id'=>1));
+db_insert('testdebug', array('id'=>2));
+db_insert('testdebug', array('id'=>3));
+$id1 = db_one('SELECT id FROM testdebug WHERE id = %id', array('id'=>1));
+$row_id2 = db_row('SELECT * FROM testdebug WHERE id = %0', array(1));
+$assoc = db_assoc('SELECT id, id FROM testdebug ORDER BY id');
+
+include './auto_append.php';
+?&gt;</pre>
+
+<h3>Output</h3>
+
+<h4>Step1 - click "db-debug (10)" to open popup window</h4>
+<img src="screenshots/test4-mysql-a.png" width="529" height="137" alt="php debug tools - debug database queries - debug console">
+
+<h4>Step2 - db-debug popup window</h4>
+<img src="screenshots/test4-mysql-b.png" width="604" height="269" alt="php debug tools - debug database queries - db-debug popup window">
+
+<h3>Input - mysql error</h3>
+<pre>&lt;?php
+require './auto_prepend.php';
+
+include './lib/db-mysql.php';
+db_connect(array(
+	'host' => 'localhost',
+	'user' => 'root',
+	'pass' => 'toor',
+	'dbname' => 'test',
+	'charset' => 'latin2'
+));
+function test()
+{
+	db_query('CREATE TABLE asd (id int PRIMARYYYY KEY)');
+}
+test();
+
+require './auto_append.php';
+?&gt;</pre>
+
+<h3>Output - mysql error</h3>
+
+<img src="screenshots/test5-mysql-error.png" width="577" height="627" alt="php debug tools - debug database queries - mysql error">
+
+<a name="changelog"></a>
+<h2>Changelog</h2>
+
+<h3>1.03</h3>
+<ul>
+	<li>Fix to dump(): function did not output, when called after a call to dump_tofile()</li>
+</ul>
+<h3>1.02</h3>
+<ul>
+	<li>New tool: lib/dump.php with dump() and dump_tofile() functions.</li>
+</ul>
+<h3>1.01</h3>
+<ul>
+	<li>changes in auto_prepend.php: invalid path to xdebug-trace script when including
+	from different directory (running tests worked, but when including for example
+	through php.ini, then paths were invalid), this also applies to db-debug script.</li>
+	<li>problems when including debug console via php.ini: the console was displayed
+	also in the xdebug trace popup window, so the original xdebug session was overwritten
+	(console is now disabled for the scripts in /dev/ by checking name of the php file, so
+	these files names cannot be changed: xdebug-trace.php, db-debug.php, db-debug-analyze.php)</li>
+	<li>fixed short open tags in php files (scripts in /dev/ now are working when short_open_tag directive is off in php.ini)</li>
+	<li>changes in lib/debug.php: possible E_NOTICE errors if you had global variables
+	named $_db or $Db, but keys debug_time/debug_queries were missing in these arrays.</li>
+</ul>
