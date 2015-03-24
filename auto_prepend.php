@@ -23,7 +23,8 @@ define('AUTO_FB_COOKIE_ONE',DEBUG_FB && 0);
 define('DB_DEBUG',DEBUG_FB && 1);
 define('FB_DEBUG_ERROR', 0);
 
-define('DB_DEBUG_SCRIPT', 'http://'.HTTP_HOST.DEBUG_DIR.'/dev/db-debug.php?time='.XDEBUG_TIME);
+define('DB_DEBUG_SCRIPT', 'http://'.HTTP_HOST.DEBUG_DIR.'/dev/db-debug.php');
+define('DB_DEBUG_SCRIPT_TIME', DB_DEBUG_SCRIPT.'?time='.XDEBUG_TIME);
 define('DB_DEBUG_ORG', DEBUG_TEMP.'/db-debug.dat');
 define('DB_DEBUG_FILE', DB_DEBUG_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');

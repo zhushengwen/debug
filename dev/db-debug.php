@@ -275,6 +275,19 @@ ob_start();
 <h1>db-debug</h1>
 
 <script>
+
+function debug_popup(url, width, height, more)
+{
+    if (!width) width = 800;
+    if (!height) height = 650;
+    var x = (screen.width/2-width/2);
+    var y = (screen.height/2-height/2);
+    var r=window.open(url, "", "scrollbars=yes,resizable=yes,width="+width+",height="+height+",screenX="+(x)+",screenY="+y+",left="+x+",top="+y+(more ? ","+more : ""));
+   	if(height==650)
+   		window.fb_trace = r;
+   	else window.fb_db = r;
+    return r;
+}
 function toggle(id)
 {
 	var truncate = document.getElementById('drow'+id);
@@ -297,7 +310,27 @@ function expand_all(){
 	};
 }
 function open_db(id){
+	this.focus();
 	scroll("sql_"+id);
+}
+function open_trace(id){
+	try{
+		opener.open_trace(id);
+	}
+	catch(e)
+	{
+		if(this.fb_trace && !this.fb_trace.closed){
+			this.fb_trace.open_trace(id);
+		}else{
+			var regr = /^.*time=(\d{10}).*$/.exec(location.href);
+			if(regr){debug_popup
+				this.fb_trace = debug_popup("<?php echo XDEBUG_TRACE_SCRIPT.'?time=';?>"+regr[1],800,500);
+				this.fb_trace.onload = function (){
+				this.open_trace(id);
+				}
+			}
+		}
+	}
 }
 function scroll(dest)
 {
@@ -329,7 +362,7 @@ function scroll(dest)
 	{
 		global $get;
 		?>
-			<td valign="top" align="center"><a id="sql_<?php echo $query['id'];?>" href="javascript:opener.open_trace(<?php echo $query['id'];?>)"><?php echo $query['id'];?></a></td>
+			<td valign="top" align="center"><a id="sql_<?php echo $query['id'];?>" href="javascript:open_trace(<?php echo $query['id'];?>)"><?php echo $query['id'];?></a></td>
 			<td valign="top"><?php echo $query['table'];?></td>
 			<td valign="top" align="center"><?php echo number_format($query['time'],3);?></td>
 			<?php if (strlen($query['query']) > 60): ?>

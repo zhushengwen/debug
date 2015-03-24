@@ -19,7 +19,7 @@ function fb_link_db($func,$params,$cid){
 		if(preg_match('#\$id = (\d+)\r\n\$sql = &apos;(.+)&apos;#', $params, $match)){
 		$id = $match[1];
 		$sql = stripslashes($match[2]);
-		return "<a id=\"sql_$id\" cid=\"$cid\" title=\"$sql\" href=\"javascript:opener.open_db($id);\">$func</a>($id)";
+		return "<a id=\"sql_$id\" cid=\"$cid\" title=\"$sql\" href=\"javascript:open_db($id);\">$func</a>($id)";
 		}
 	}
 	return $func;
@@ -562,7 +562,39 @@ function expand_func(base_call_id)
 	}
 	base_a.blur();
 }
+function debug_popup(url, width, height, more)
+{
+    if (!width) width = 800;
+    if (!height) height = 650;
+    var x = (screen.width/2-width/2);
+    var y = (screen.height/2-height/2);
+    var r=window.open(url, "", "scrollbars=yes,resizable=yes,width="+width+",height="+height+",screenX="+(x)+",screenY="+y+",left="+x+",top="+y+(more ? ","+more : ""));
+   	if(height==650)
+   		window.fb_trace = r;
+   	else window.fb_db = r;
+    return r;
+}
+function open_db(id){
+	try{
+		opener.open_db(id);
+	}
+	catch(e)
+	{
+		if(this.fb_db && !this.fb_db.closed){
+			this.fb_db.open_db(id);
+		}else{
+			var regr = /^.*time=(\d{10}).*$/.exec(location.href);
+			if(regr){
+				this.fb_db = debug_popup("<?php echo DB_DEBUG_SCRIPT.'?time=';?>"+regr[1],800,500);
+				this.fb_db.onload = function (){
+								this.open_db(id);
+				}
+			}
+		}
+	}
+}
 function open_trace(id){
+	this.focus();
 	var dba = $('sql_'+id);
 	if(dba){
 		var call_id = parseInt(dba.getAttribute('cid'));
