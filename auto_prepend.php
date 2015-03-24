@@ -2,7 +2,7 @@
 //require dirname(__FILE__).'/debug/auto_prepend.php';
 date_default_timezone_set("Asia/Shanghai");
 ob_start();
-define('DEBUG_FB',0);
+define('DEBUG_FB',1);
 define('AUTOD_FB',1);
 define('IS_GBK',0);
 define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && true);
