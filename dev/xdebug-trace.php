@@ -469,7 +469,7 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	-
 	<a href="javascript:void(0)" onclick="alert($('help').innerHTML.trim());">Help</a>
 	-
-	<a href="db-debug.php?time=<?php echo $_GET['time'];?>" target="_blank">DB</a>
+	<a href="javascript:open_db(0);">DB</a>
 	
 </p>
 <p>
