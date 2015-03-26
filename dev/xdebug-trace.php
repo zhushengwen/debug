@@ -468,10 +468,9 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	<a href="javascript:scroll('summary')">Summary</a>
 	-
 	<a href="javascript:void(0)" onclick="alert($('help').innerHTML.trim());">Help</a>
-	<!--
 	-
-	Wy¶wietlaj: <b>sekwencyjnie</b> | <a href="javascript:void(0)" onclick="alert('todo')">grupuj po zagnie¿d¿eniach</a>
-	-->
+	<a href="db-debug.php?time=<?php echo $_GET['time'];?>">DB</a>
+	
 </p>
 <p>
 	<a href="javascript:collapse_all()" id="collapse-all">Collapse all</a>
