@@ -154,7 +154,7 @@ if(DEBUG_FB)
     {
      register_shutdown_function('debug_console', 1);
     }
-    debug_start();
+    fb_debug_start();
 }
 function fb_query($sql,$con = null){
   global $_db;

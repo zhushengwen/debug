@@ -1456,7 +1456,7 @@ SCRIPT;
 	if ($display) echo $ret;
 	else return $ret;
 }
-function debug_start()
+function fb_debug_start()
 {
 	if (debug_dev_dir()) {
 		return;
@@ -1473,7 +1473,7 @@ function debug_start()
 	define('DEBUG_CONSOLE_MEMORY', memory_get_usage());
 	define('DEBUG_CONSOLE_TIME', microtime(1));
 }
-function debug_stop()
+function fb_debug_stop()
 {
 	if (debug_dev_dir()) {
 		return;
