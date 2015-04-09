@@ -94,7 +94,7 @@ function ps($file)
   $file,$file,$file);
 }
 
-function myErrorHandler($errno, $errstr, $file, $line){
+function myErrorHandler123($errno, $errstr, $file, $line){
 if(!(error_reporting() &$errno)){return;}
 $url="[$errno]:$errstr in $file on line $line\r\n";
 file_put_contents(DEBUG_TEMP.'/error.log', $url,FILE_APPEND);
