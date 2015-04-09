@@ -142,9 +142,9 @@ if(DEBUG_FB)
         {
             require_once $path; 
             if(AUTOD_FB){
-            $_db['mysql_query']='mysql_query_back';
-            if(!function_exists($_db['mysql_query']))
-            runkit_function_copy('mysql_query',$_db['mysql_query']);
+            $_SERVER['mysql_query']='mysql_query_back';
+            if(!function_exists($_SERVER['mysql_query']))
+            runkit_function_copy('mysql_query',$_SERVER['mysql_query']);
             runkit_function_redefine('mysql_query','$sql,$con=null','return fb_query($sql,$con);');
             }
         }

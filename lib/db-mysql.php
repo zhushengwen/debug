@@ -50,7 +50,7 @@ function db_query($query,$con)
 	if (DB_DETECT_MISSING_WHERE) db_detect_missing_where($query);
 	if (DB_DETECT_INJECTION) db_detect_injection($query);
 	if (DB_DEBUG) $microstart = microtime(true);
-    $result = $con?$_db['mysql_query']($query, $con):$_db['mysql_query']($query);
+    $result = $con?$_SERVER['mysql_query']($query, $con):$_SERVER['mysql_query']($query);
 	if (DB_DEBUG) {
 		$time = microtime(true)-$microstart;
 		$_db['debug_queries'][] = array('query'=>$query, 'time'=>$time ,'seq'=>$_db['debug_count']+1,'data' => json_encode(is_resource($result)?db_result($result):''));
