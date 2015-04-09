@@ -3,9 +3,10 @@
 date_default_timezone_set("Asia/Shanghai");
 ob_start();
 define('DEBUG_FB',1);
-define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('IS_GBK',0);
-define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && true);
+defined('DEBUG_CONSOLE_HIDE');
+define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
+define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && $_SERVER['SERVER_ADDR']==$_SERVER['REMOTE_ADDR']);
 define('DEBUG_DIR', debug_dir());
 define('DEBUG_TEMP', ini_get('upload_tmp_dir'));
 define('DEBUG_FB_DIR', dirname(__FILE__));
@@ -106,7 +107,7 @@ function fd($var)
  file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',XDEBUG_TIME).'.log',var_export($var,true)."\r\n",FILE_APPEND);
 }
 function fe($a){var_dump($a);exit;}
-#set_error_handler('myErrorHandler',E_ALL);
+#set_error_handler('myErrorHandler123',E_ALL);
 
  function ff()
  {
@@ -139,14 +140,13 @@ if(DEBUG_FB)
         $path = dirname(__FILE__).'/lib/db-mysql.php';
         if(file_exists($path))
         {
-            require_once $path; fd(function_exists('mysql_query'));
+            require_once $path; 
             if(AUTOD_FB){
             $_db['mysql_query']='mysql_query_back';
             if(!function_exists($_db['mysql_query']))
             runkit_function_copy('mysql_query',$_db['mysql_query']);
             runkit_function_redefine('mysql_query','$sql,$con=null','return fb_query($sql,$con);');
             }
-            
         }
   
     }
