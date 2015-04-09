@@ -6,7 +6,7 @@ define('DEBUG_FB',1);
 define('IS_GBK',0);
 defined('DEBUG_CONSOLE_HIDE');
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
-define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && $_SERVER['SERVER_ADDR']==$_SERVER['REMOTE_ADDR']);
+define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && $_SERVER['LOCAL_ADDR']==$_SERVER['REMOTE_ADDR']);
 define('DEBUG_DIR', debug_dir());
 define('DEBUG_TEMP', ini_get('upload_tmp_dir'));
 define('DEBUG_FB_DIR', dirname(__FILE__));
