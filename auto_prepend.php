@@ -3,7 +3,7 @@
 date_default_timezone_set("Asia/Shanghai");
 ob_start();
 define('DEBUG_FB',1);
-define('AUTOD_FB',1);
+define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('IS_GBK',0);
 define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && true);
 define('DEBUG_DIR', debug_dir());
@@ -139,12 +139,14 @@ if(DEBUG_FB)
         $path = dirname(__FILE__).'/lib/db-mysql.php';
         if(file_exists($path))
         {
-            require_once $path; 
+            require_once $path; fd(function_exists('mysql_query'));
             if(AUTOD_FB){
             $_db['mysql_query']='mysql_query_back';
-            @runkit_function_rename('mysql_query',$_db['mysql_query']);
-            @runkit_function_redefine('mysql_query','$sql,$con=null','return fb_query($sql,$con);');
+            if(!function_exists($_db['mysql_query']))
+            runkit_function_copy('mysql_query',$_db['mysql_query']);
+            runkit_function_redefine('mysql_query','$sql,$con=null','return fb_query($sql,$con);');
             }
+            
         }
   
     }
