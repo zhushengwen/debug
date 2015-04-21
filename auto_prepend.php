@@ -8,10 +8,11 @@ defined('DEBUG_CONSOLE_HIDE');
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR']==$_SERVER['REMOTE_ADDR']);
 define('DEBUG_DIR', debug_dir());
-define('DEBUG_TEMP', ini_get('upload_tmp_dir'));
+define('DEBUG_TEMP', getenv('TEMP'));
+
 define('DEBUG_FB_DIR', dirname(__FILE__));
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
-define('HTTP_HOST',isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost');
+define('HTTP_HOST',!isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost:88');
 define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
 define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST.XDEBUG_TRACE_SCRIPT_PATH);
 define('XDEBUG_TIME',time());
@@ -29,8 +30,6 @@ define('DB_DEBUG_SCRIPT_TIME', DB_DEBUG_SCRIPT.'?time='.XDEBUG_TIME);
 define('DB_DEBUG_ORG', DEBUG_TEMP.'/db-debug.dat');
 define('DB_DEBUG_FILE', DB_DEBUG_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
-
-
 
 
 if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
