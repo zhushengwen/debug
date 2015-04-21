@@ -6,13 +6,13 @@ define('DEBUG_FB',1);
 define('IS_GBK',0);
 defined('DEBUG_CONSOLE_HIDE');
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
-define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR']==$_SERVER['REMOTE_ADDR']);
+define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR'])==$_SERVER['REMOTE_ADDR']);
 define('DEBUG_DIR', debug_dir());
 define('DEBUG_TEMP', getenv('TEMP'));
 
 define('DEBUG_FB_DIR', dirname(__FILE__));
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
-define('HTTP_HOST',!isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost:88');
+define('HTTP_HOST',isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost');
 define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
 define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST.XDEBUG_TRACE_SCRIPT_PATH);
 define('XDEBUG_TIME',time());
