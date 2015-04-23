@@ -67,7 +67,7 @@ function fc($var){
 //.mt_rand(1000,9999)
 setcookie(999+(9000 - (XDEBUG_TIME%9000)).date('.H:i:s'),json_encode($var),/*XDEBUG_TIME + 60*5*/ null,'/');
 }
-function cc($key){
+function c_c($key){
 setcookie($key,null,null,'/');
 }
 function stack()
@@ -126,7 +126,7 @@ $_SERVER['FB_COOKIE_DC'] = count($_COOKIE) - 20;
 array_walk($_COOKIE,function($val,$key){
 if(preg_match( "/^\d{4}_\d{2}:\d{2}:\d{2}$/", $key, $matches))
 if($matches && (AUTO_FB_COOKIE_ONE || $_SERVER['FB_COOKIE_DC']-- >0))
-    cc(str_replace('_','.',$matches[0]));
+    c_c(str_replace('_','.',$matches[0]));
 });
 
 
@@ -145,7 +145,7 @@ if(DEBUG_FB)
             if(!function_exists($_SERVER['mysql_query']))
             runkit_function_copy('mysql_query',$_SERVER['mysql_query']);
             runkit_function_redefine('mysql_query','$sql,$con=null','return fb_query($sql,$con);');
-            }
+            }else $_SERVER['mysql_query']='mysql_query';
         }
   
     }
