@@ -1,6 +1,6 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] .'/fb.php';
-echo '<h1>test3: trace</h1>';
+echo '<h1>test3: trace1</h1>';
 function test1()
 {
 	test2();
