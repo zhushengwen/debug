@@ -10,6 +10,7 @@ define('DEBUG_CONSOLE',isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_AD
 define('DEBUG_DIR', debug_dir());
 define('DEBUG_TEMP', getenv('TEMP'));
 
+define('FB_DEBUG_FORCE',0);
 define('DEBUG_FB_DIR', dirname(__FILE__));
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
 define('HTTP_HOST',isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost');
@@ -116,7 +117,7 @@ function fe($a){var_dump($a);exit;}
  {
     echo bl_debug();
  }
-if(DEBUG_FB && isset($_COOKIE['xdebug-trace']) && $_SERVER['SCRIPT_NAME']!=XDEBUG_TRACE_SCRIPT_PATH)
+if(DEBUG_FB && (isset($_COOKIE['xdebug-trace'])||FB_DEBUG_FORCE) && $_SERVER['SCRIPT_NAME']!=XDEBUG_TRACE_SCRIPT_PATH)
 {
  file_put_contents(DEBUG_TEMP.'/xdebug-trace.html',date('Y-m-d H:i:s',XDEBUG_TIME).'-'.XDEBUG_TIME.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'</a><br/>',FILE_APPEND);
  if(AUTO_FB_COOKIE)

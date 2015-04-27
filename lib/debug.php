@@ -1465,7 +1465,7 @@ function fb_debug_start()
 	if ($called) return;
 	else $called = true;
 
-	if (function_exists('xdebug_start_trace') && isset($_COOKIE['xdebug-trace'])) {
+	if (function_exists('xdebug_start_trace') && (isset($_COOKIE['xdebug-trace']) || FB_DEBUG_FORCE) ) {
 		ini_set('xdebug.collect_includes', 1);
 		xdebug_start_trace(XDEBUG_XT_FILE, 2);
 		define('XDEBUG_STARTED', 1);
