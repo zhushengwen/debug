@@ -1296,9 +1296,9 @@ function debug_console($display=false)
 	if (debug_dev_dir()) {
 		return;
 	}
-
     if(defined('DEBUG_CONSOLE') && !DEBUG_CONSOLE) return;
     if(DEBUG_AJAX)return;
+    if(stristr(ob_get_contents(),'<html>')===false)return;
 	global $_db, $Db;
 
 	$db_time = null;
