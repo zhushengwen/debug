@@ -821,12 +821,21 @@ function debug_list()
 		html += '<div><a title="'+list[i].uri+'" style="color:'+ (uri==list[i].uri?'blue':'black')+';" href="'+list[i].uri+'" target="_blank">'+list[i].method+'</a>:<a'+ (uri==list[i].uri?' style="color:blue;"':'')+' title="'+list[i].uri+'" href="javascript:'+ list[i].url  +';void(0);">'+s+'</a></div>';
 	}
 
-	console.log(html);
+
 	var newNode = document.createElement("div");
 
 	newNode.innerHTML = html;
 	newNode.className = "debug_console";
 	document.body.appendChild(newNode);
+
+	newNode.children[0].onclick = function(){
+		var nds = newNode.children;
+		for (var i = 1; i < nds.length; i++) {
+			with(nds[i].style){
+				if(display=="")display="none";else display = "";
+			}
+		};
+	}
 }
 debug_list();
 </script>
