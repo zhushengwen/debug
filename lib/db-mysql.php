@@ -128,7 +128,6 @@ function db_cleanup()
 	else $called = true;
 	global $_db;
 	if (DB_DEBUG && DB_DEBUG_FILE && isset($_db['record'])) {
-		fd($_db['record']);
 		file_put_contents(DB_DEBUG_FILE, serialize($_db['record']));
 	}
 }
