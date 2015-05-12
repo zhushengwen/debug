@@ -10,7 +10,16 @@ ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
 ini_set('date.timezone', 'Asia/Shanghai');
 
 if(FB_DEBUG_ERROR)set_error_handler('debug_error');
-
+function debug_record()
+{
+	foreach($GLOBALS as $k => $v)
+	{
+	    if($k != 'GLOBALS')
+	    {
+	        $re['$'.$k]=$v;
+	    }
+	}
+}
 function debug_error($error_no, $error_msg, $error_file, $error_line, $error_context)
 {
 	// check with error_reporting, if statement is preceded with @ we have to ignore it
@@ -1298,7 +1307,8 @@ function debug_console($display=false)
 	}
     if(defined('DEBUG_CONSOLE') && !DEBUG_CONSOLE) return;
     if(DEBUG_AJAX)return;
-    if(stristr(ob_get_contents(),'<html>')===false)return;
+    $content = ob_get_contents();
+    if(trim($content)!=''&&stristr($content,'</')===false)return;
 	global $_db, $Db;
 
 	$db_time = null;
@@ -1309,8 +1319,8 @@ function debug_console($display=false)
 	}
 
 	$db_cqueries = null;
-	if (isset($_db['debug_queries'])) {
-		$db_cqueries = count($_db['debug_queries']);
+	if (isset($_db['record']['debug_queries'])) {
+		$db_cqueries = count($_db['record']['debug_queries']);
 	} else if (isset($Db['DebugQueries'])) {
 		$db_cqueries = count($Db['DebugQueries']);
 	}

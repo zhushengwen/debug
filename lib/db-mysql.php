@@ -5,7 +5,8 @@
 */
 
 global $_db;
-$_db = array(
+if(!$_db)$_db = array();
+$_db = array_merge($_db, array(
 	'link' => null,
 	'dbname' => null,
 	'transaction_level' => 0,
@@ -13,8 +14,7 @@ $_db = array(
 	'debug_queries' => array(),
 	'debug_count' => null,
 	'debug_time' => null,
-	'mysql_query'=>'mysql_query',
-);
+));
 
 if (!defined('DB_DETECT_MISSING_WHERE')) define('DB_DETECT_MISSING_WHERE',0);
 if (!defined('DB_DETECT_INJECTION')) define('DB_DETECT_INJECTION',0);
@@ -53,7 +53,7 @@ function db_query($query,$con)
     $result = $con?$_SERVER['mysql_query']($query, $con):$_SERVER['mysql_query']($query);
 	if (DB_DEBUG) {
 		$time = microtime(true)-$microstart;
-		$_db['debug_queries'][] = array('query'=>$query, 'time'=>$time ,'seq'=>$_db['debug_count']+1,'data' => json_encode(is_resource($result)?db_result($result):''));
+		$_db['record']['debug_queries'][] = array('query'=>$query, 'time'=>$time ,'seq'=>$_db['debug_count']+1,'data' => json_encode(is_resource($result)?db_result($result):''));
 		$_db['debug_count']++; $_db['debug_time'] += $time;
 	}
 	return $result;
@@ -127,8 +127,9 @@ function db_cleanup()
 	if ($called) return;
 	else $called = true;
 	global $_db;
-	if (DB_DEBUG && DB_DEBUG_FILE) {
-		file_put_contents(DB_DEBUG_FILE, serialize($_db['debug_queries']));
+	if (DB_DEBUG && DB_DEBUG_FILE && isset($_db['record'])) {
+		fd($_db['record']);
+		file_put_contents(DB_DEBUG_FILE, serialize($_db['record']));
 	}
 }
 

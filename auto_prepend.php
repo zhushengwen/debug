@@ -18,7 +18,7 @@ define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
 define('HTTP_HOST',isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost');
 define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
 define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST.XDEBUG_TRACE_SCRIPT_PATH);
-define('XDEBUG_TIME',time());
+define('XDEBUG_TIME',(microtime(1)*10000).rand(1000,9999));
 define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
 
 
@@ -33,7 +33,7 @@ define('DB_DEBUG_SCRIPT_TIME', DB_DEBUG_SCRIPT.'?time='.XDEBUG_TIME);
 define('DB_DEBUG_ORG', DEBUG_TEMP.'/db-debug.dat');
 define('DB_DEBUG_FILE', DB_DEBUG_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
-
+define('dg','fb(get_defined_vars());');
 
 if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
 
@@ -55,20 +55,13 @@ function debug_dir()
 
 function fa($var){echo "<script>console.log(".json_encode($var).")</script>";}
 
-$path = DEBUG_FB_DIR .'/fb.php';
-if(file_exists($path) && isset($_SERVER['HTTP_USER_AGENT']) && !(strpos($_SERVER['HTTP_USER_AGENT'],'FirePHP') === false)){
-    require_once $path;
-    }
- else {
-  
-     eval('function fb($var){fa($var);}');
- }
 
 
-define('dg','fb(get_defined_vars());');
+
+
 function fc($var){
 //.mt_rand(1000,9999)
-setcookie(999+(9000 - (XDEBUG_TIME%9000)).date('.H:i:s'),json_encode($var),/*XDEBUG_TIME + 60*5*/ null,'/');
+setcookie(999+(9000 - (intval(XDEBUG_TIME/100000000)%9000)).date('.H:i:s'),json_encode($var),/*XDEBUG_TIME + 60*5*/ null,'/');
 }
 function c_c($key){
 setcookie($key,null,null,'/');
@@ -86,16 +79,6 @@ function stack()
   $html=__FILE__.":{$line}GoTo<a href='notepad2://".__FILE__."/?$line'>$line</a><p>".$html;return $html;
 }
 
-function pt($file,$line=1,$title='')
-{
-  return sprintf('%s:<a style="display:inline;text-decoration: none;" title="%s" href="javascript:location.href=\'notepad2://\'+((\'%s\'.indexOf(\':\')==-1)?\'http://\'+location.host:\'\')+\'%s/?%s\'"><b>%s</b></a>',
-  $file,$title,$file,$file,$line,$line);
-}
-function ps($file)
-{
-  return sprintf('<a style="display:inline;text-decoration: none;" href="javascript:location.href=\'notepad2://\'+((\'%s\'.indexOf(\':\')==-1)?\'http://\'+location.host:\'\')+\'%s/?1\'"><b>%s</b></a>',
-  $file,$file,$file);
-}
 
 function myErrorHandler123($errno, $errstr, $file, $line){
 if(!(error_reporting() &$errno)){return;}
@@ -119,18 +102,49 @@ function fe($a){var_dump($a);exit;}
  {
     echo bl_debug();
  }
-if(DEBUG_FB && (isset($_COOKIE['xdebug-trace'])||FB_DEBUG_FORCE) && $_SERVER['SCRIPT_NAME']!=XDEBUG_TRACE_SCRIPT_PATH)
+
+function fr()
 {
- file_put_contents(DEBUG_TEMP.'/xdebug-trace.html',date('Y-m-d H:i:s',XDEBUG_TIME).'-'.XDEBUG_TIME.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'</a><br/>',FILE_APPEND);
- if(AUTO_FB_COOKIE)
- fc(array('method'=>(DEBUG_AJAX?'ajax_':'').$_SERVER['REQUEST_METHOD'],'uri'=>XDEBUG_HTTP_HOST.$_SERVER['REQUEST_URI'],'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')"));
+  $path = DEBUG_FB_DIR .'/fb.php';
+  if(file_exists($path) && isset($_SERVER['HTTP_USER_AGENT']) && !(strpos($_SERVER['HTTP_USER_AGENT'],'FirePHP') === false)){
+      require_once $path;
+      }
+   else {
+    
+       eval('function fb($var){fa($var);}');
+   }
+  $fb_data = array('method'=>(DEBUG_AJAX?'ajax_':'').$_SERVER['REQUEST_METHOD'],
+    'uri'=>XDEBUG_HTTP_HOST.$_SERVER['REQUEST_URI'],
+    'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
+  
+  if(DEBUG_FB && (isset($_COOKIE['xdebug-trace'])||FB_DEBUG_FORCE) && $_SERVER['SCRIPT_NAME']!=XDEBUG_TRACE_SCRIPT_PATH)
+  {
+   file_put_contents(DEBUG_TEMP.'/xdebug-trace.html',date('Y-m-d H:i:s',XDEBUG_TIME).'-'.XDEBUG_TIME.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'</a><br/>',FILE_APPEND); 
+   if(AUTO_FB_COOKIE)fc($fb_data);
+   $fb_data['url']=XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME;
+    foreach($GLOBALS as $k => $v)
+    {
+        if(!in_array($k, array('GLOBALS','_db')))
+        {
+            $re['$'.$k]=$v;
+        }
+    }
+    $fb_data['GLOBALS'] = $re;
+  }   
+    
+    global $_db;
+    $_db['record']['data'] = $fb_data;
+
+  $_SERVER['FB_COOKIE_DC'] = count($_COOKIE) - 20;
+  array_walk($_COOKIE,function($val,$key){
+  if(preg_match( "/^\d{4}_\d{2}:\d{2}:\d{2}$/", $key, $matches))
+  if($matches && (AUTO_FB_COOKIE_ONE || $_SERVER['FB_COOKIE_DC']-- >0))
+      c_c(str_replace('_','.',$matches[0]));
+  });
 }
-$_SERVER['FB_COOKIE_DC'] = count($_COOKIE) - 20;
-array_walk($_COOKIE,function($val,$key){
-if(preg_match( "/^\d{4}_\d{2}:\d{2}:\d{2}$/", $key, $matches))
-if($matches && (AUTO_FB_COOKIE_ONE || $_SERVER['FB_COOKIE_DC']-- >0))
-    c_c(str_replace('_','.',$matches[0]));
-});
+
+
+fr();
 
 
 if(DEBUG_FB)

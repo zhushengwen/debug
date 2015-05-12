@@ -13,6 +13,16 @@ $memorystart = memory_get_usage();
 
 $show_headers = false;
 $show_debug = false;
+function pt($file,$line=1,$title='')
+{
+  return sprintf('%s:<a style="display:inline;text-decoration: none;" title="%s" href="javascript:location.href=\'notepad2://\'+((\'%s\'.indexOf(\':\')==-1)?\'http://\'+location.host:\'\')+\'%s/?%s\'"><b>%s</b></a>',
+  $file,$title,$file,$file,$line,$line);
+}
+function ps($file)
+{
+  return sprintf('<a style="display:inline;text-decoration: none;" href="javascript:location.href=\'notepad2://\'+((\'%s\'.indexOf(\':\')==-1)?\'http://\'+location.host:\'\')+\'%s/?1\'"><b>%s</b></a>',
+  $file,$file,$file);
+}
 function fb_link_db($func,$params,$cid){
 	if($func=='db_empty'){
 		$temp = $params;
@@ -31,7 +41,7 @@ function _debug()
 	echo '<div>Time: '.number_format(microtime(1)-$microstart,2).'</div>';
 	exit();
 }
-$gtime = get('time','int');
+$gtime =$_GET['time'];
 $trace_xt = DEBUG_TEMP."/xdebug-trace.$gtime.xt";
 $group_nested = get('group-nested', 'bool');
 
@@ -429,6 +439,11 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	a.expanded { text-decoration: none; }
 	a.collapsed { text-decoration: underline; }
 	span.user-defined { color:#2B2B99; }
+	.debug_console { position: fixed; bottom: 0.5em; right: 0.5em; color: #666; z-index: 50000; text-align: left; background: #f5f5f5; padding: 0.25em 0.5em; border: #ccc 1px solid; border-style: solid none none solid; font: normal 11px/16px "Lucida Grande", Verdana, Arial, "Bitstream Vera Sans", sans-serif; text-decoration: none; padding: 2px 8px !important; border: 1px solid #bbb;	-moz-border-radius: 11px; -khtml-border-radius: 11px; -webkit-border-radius: 11px; border-radius: 11px; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; -khtml-box-sizing: content-box; box-sizing: content-box; color: #464646;}
+	.debug_console div { margin: 0.1em 0em; }
+	.debug_console a { text-decoration: none; color: #21759b; }
+	.debug_console a.start { }
+	.debug_console a.stop { color: #d54e21; }
 	</style>
 </head>
 <body>
@@ -582,7 +597,7 @@ function open_db(id){
 		if(this.fb_db && !this.fb_db.closed){
 			this.fb_db.open_db(id);
 		}else{
-			var regr = /^.*time=(\d{10}).*$/.exec(location.href);
+			var regr = /^.*time=(\d{18}).*$/.exec(location.href);
 			if(regr){
 				this.fb_db = debug_popup("<?php echo DB_DEBUG_SCRIPT.'?time=';?>"+regr[1],800,500);
 				this.fb_db.onload = function (){
@@ -594,6 +609,7 @@ function open_db(id){
 }
 function open_trace(id){
 	this.focus();
+	if(!id)return;
 	var dba = $('sql_'+id);
 	if(dba){
 		var call_id = parseInt(dba.getAttribute('cid'));
@@ -737,7 +753,18 @@ function scroll_current_pos()
 	}
 	$summary = array_msort($summary, array('count'=>SORT_DESC, 'func'=>SORT_ASC));
 ?>
-
+<?php 
+$debug_time = isset($_GET['time'])?$_GET['time']:$_SERVER['QUERY_STRING'];
+$data_file = DB_DEBUG_ORG.'.'.$debug_time;
+if (file_exists($data_file)) {
+	include_once './krumo/class.krumo.php';
+	$data = unserialize(file_get_contents($data_file));
+ ?>
+<a id="DataSumary" name="DataSumary"></a>
+<h2 style="float:left;"><?php echo $data['data']['method'].' : <a target="_blank" style="color:black;" href="'.$data['data']['uri'].'">'.$data['data']['uri'].'</a>';?></h2>
+<a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="history.go(-1);window.scrollTo(0,0)">Up</a>
+<div style="clear:both;"></div>
+<?php krumo($data,'DataView'); }?>
 <a id="summary" name="summary"></a>
 <h2 style="float:left;">Summary</h2>
 <a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="history.go(-1);window.scrollTo(0,0)">Up</a>
@@ -764,8 +791,45 @@ function scroll_current_pos()
 <?php if ($show_debug): ?>
 	<div>Time: <?php echo number_format(microtime(1)-$microstart,3);?></div>
 <?php endif; ?>
-
 </body>
+<script>
+function debug_list()
+{
+	var uri = <?php echo isset($data['data']['uri'])?'"'.$data['data']['uri'].'";':'';?>
+	var list = [];
+	var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; ++i) {
+        var a = cookies[i].split('=');
+        if (a.length == 2) {
+            a[0] = a[0].replace(/^\s*|\s*$/g, '');
+            a[1] = a[1].replace(/^\s*|\s*$/g, '');
+            if(/^\d{4}\.\d{2}:\d{2}:\d{2}$/.test(a[0])) 
+            	list.push(JSON.parse(unescape(a[1])));
+        }
+    }
+	
+	var html = '<div>DebugList -- Count('+list.length+')</div>';
+	for(var i=list.length-1;i>=0;i--)
+	{
+		var s = list[i].uri;
+		var r = s.indexOf('://');
+		var t = s.indexOf('/',r+3);
+		if(s.length-t>40)
+		{
+			s = s.substr(t,10)+'...'+s.substr(-30);
+		}else s=s.substr(t);
+		html += '<div><a title="'+list[i].uri+'" style="color:'+ (uri==list[i].uri?'blue':'black')+';" href="'+list[i].uri+'" target="_blank">'+list[i].method+'</a>:<a'+ (uri==list[i].uri?' style="color:blue;"':'')+' title="'+list[i].uri+'" href="javascript:'+ list[i].url  +';void(0);">'+s+'</a></div>';
+	}
+
+	console.log(html);
+	var newNode = document.createElement("div");
+
+	newNode.innerHTML = html;
+	newNode.className = "debug_console";
+	document.body.appendChild(newNode);
+}
+debug_list();
+</script>
 </html>
 <?php ob_end_flush(); ?>
 <?php

@@ -29,7 +29,7 @@ $date = date_by_time($match[0]);
 */
 
 if (!file_exists($data_file)) {
-	trigger_error($data_file.' not found', E_USER_ERROR);
+	exit('Date File:'.$data_file.' Not Found!');
 }
 
 function query_cut($query)
@@ -102,9 +102,8 @@ function table_from_query($query)
 }
 
 $data = unserialize(file_get_contents($data_file));
-
 $queries = array();
-foreach ($data as $k => $row)
+foreach ($data['debug_queries'] as $k => $row)
 {
 	$query = array();
 
@@ -272,7 +271,7 @@ ob_start();
 </head>
 <body>
 
-<h1>db-debug</h1>
+<h1>db-debug <font size="1"><a style="color:grey;" href="javascript:open_trace(0);"><?php echo $data['data']['method'].':'.$data['data']['uri'];?></a></font></h1>
 
 <script>
 
@@ -311,7 +310,7 @@ function expand_all(){
 }
 function open_db(id){
 	this.focus();
-	scroll("sql_"+id);
+	if(id)scroll("sql_"+id);
 }
 function open_trace(id){
 	try{
@@ -322,7 +321,7 @@ function open_trace(id){
 		if(this.fb_trace && !this.fb_trace.closed){
 			this.fb_trace.open_trace(id);
 		}else{
-			var regr = /^.*time=(\d{10}).*$/.exec(location.href);
+			var regr = /^.*time=(\d{18}).*$/.exec(location.href);
 			if(regr){debug_popup
 				this.fb_trace = debug_popup("<?php echo XDEBUG_TRACE_SCRIPT.'?time=';?>"+regr[1],800,500);
 				this.fb_trace.onload = function (){
