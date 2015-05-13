@@ -609,6 +609,7 @@ function open_db(id){
 }
 function open_trace(id){
 	this.focus();
+	with(document.body.style){var k=0.01;s=3000;e=4000;p=e;t=20;n=1;i=3040;(function(){if(!(i>s&&i<e)){t=-t;n--;}i+=t;backgroundColor="#"+i.toString(16);if(i-p&&n>0)setTimeout(arguments.callee,1);else backgroundColor="#FFF";})();}
 	if(!id)return;
 	var dba = $('sql_'+id);
 	if(dba){

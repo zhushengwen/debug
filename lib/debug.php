@@ -1292,11 +1292,7 @@ function debug_query($query)
 
 // -------- debug console
 
-function debug_dev_dir()
-{
-	$script = basename($_SERVER['PHP_SELF']);
-	return in_array($script, array('xdebug-trace.php', 'db-debug.php', 'db-debug-analyze.php'));
-}
+
 function debug_console($display=false)
 {
 	if (defined('DEBUG_CONSOLE_HIDE') && DEBUG_CONSOLE_HIDE) {
