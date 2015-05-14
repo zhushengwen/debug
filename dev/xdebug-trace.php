@@ -760,17 +760,101 @@ $data_file = DB_DEBUG_ORG.'.'.$debug_time;
 if (file_exists($data_file)) {
 	include_once './krumo/class.krumo.php';
 	$data = unserialize(file_get_contents($data_file));
+	$method = $data['data']['method'];
+	$uri = $data['data']['uri'];
+	$is_ajax = strpos($method, 'ajax')!==false?1:0;
+	$is_post = strpos($method, 'POST')!==false?1:0;
+	$re_method = $is_ajax?substr($method,5):$method;
+	$get_data =  $data['data']['GLOBALS']['$_GET'];
+	$post_data =  $data['data']['GLOBALS']['$_POST'];
+	$cookie_data =  $data['data']['GLOBALS']['$_COOKIE'];
+	$req_data = http_build_query($is_post?$post_data:$get_data);
  ?>
 <a id="DataSumary" name="DataSumary"></a>
-<h2 style="float:left;"><?php echo $data['data']['method'].' : <a target="_blank" style="color:black;" href="'.$data['data']['uri'].'">'.$data['data']['uri'].'</a>';?></h2>
-<a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="history.go(-1);window.scrollTo(0,0)">Up</a>
+<h2 style="float:left;"><?php echo $method.' : <a target="_blank" style="color:black;" href="'.$uri.'">'.$uri.'</a>';?></h2>
+<a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="redo();">Replay</a>
+<script>
+function debug_cookie_set(name, value)
+{
+    var cookie = (name + '=' + escape(value));
+    cookie += '; path=/';
+    document.cookie = cookie;
+}
+function redo(){
+var l = '<?php echo $uri;?>';
+var ajax = <?php echo $is_ajax;?>;
+var method = '<?php echo $re_method;?>';
+var d = '<?php echo $req_data;?>';
+debug_cookie_set('xdebug-replay','1');
+if(!ajax){
+	if(!window.replay_form)
+	{
+		window.replay_form = document.createElement("form");
+		replay_form.action = l;
+	    replay_form.target = "replay_frm";
+	    replay_form.method = method;
+	    replay_form.style.display="none";		
+		document.body.appendChild(replay_form);
+
+		var ifm=document.createElement("iframe");
+		ifm.name="replay_frm";
+		ifm.style.display="none";
+		document.body.appendChild(ifm);
+
+		if(ifm.attachEvent){
+		ifm.attachEvent("onload", function(){ 
+		var str = ifm.contentWindow; 
+		debug_popup(str.document.body.innerHTML); 
+		})}else{
+		ifm.onload = function(){ 
+		var str = ifm.contentWindow; 
+		debug_popup(str.document.body.innerHTML); 
+		}}   
+
+
+	    var ar=d.split('&');
+	    for(var a in ar)
+	    {
+		    	var br=ar[a].split('=');
+		        if(br[0])
+	            {
+	            var input = document.createElement("input");
+		        input.name = br[0];
+		        input.value = br[1]||'';
+		        input.type = 'hidden';
+		        replay_form.appendChild(input);
+		    	}
+	    }
+	}
+	replay_form.submit();return;
+	}
+var p = <?php echo $is_post;?>;
+var r = new(self.XMLHttpRequest||ActiveXObject)("Microsoft.XMLHTTP");
+r.onreadystatechange = function() {
+	if (r.readyState == 4 && r.status == 200){debug_popup(r.responseText);}
+}
+if(p){
+	r.open('POST', l, true);
+	r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+	r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
+	r.send(d);
+}
+else{
+	r.open('GET', l + (d&&l.indexOf('?')==-1?'?':'') + (d&&l.indexOf('&')==l.length-1?'':'&') + d, true);
+	r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+	r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
+	r.send();
+}
+
+}
+</script>
+<?php  }?>
 <div style="clear:both;"></div>
-<?php krumo($data,'DataView'); }?>
+<?php krumo($data,'DataView');?>
 <a id="summary" name="summary"></a>
 <h2 style="float:left;">Summary</h2>
-<a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="history.go(-1);window.scrollTo(0,0)">Up</a>
+<a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="history.go(-1);window.scrollTo(0,0);">Up</a>
 <div style="clear:both;"></div>
-
 <table cellspacing="1">
 <tr>
 	<th>#</th>
@@ -794,6 +878,18 @@ if (file_exists($data_file)) {
 <?php endif; ?>
 </body>
 <script>
+function debug_popup(url, width, height, more)
+{
+    if (!width) width = 800;
+    if (!height) height = 650;
+    var x = (screen.width/2-width/2);
+    var y = (screen.height/2-height/2);
+    var r=window.open(url, "", "scrollbars=yes,resizable=yes,width="+width+",height="+height+",screenX="+(x)+",screenY="+y+",left="+x+",top="+y+(more ? ","+more : ""));
+   	if(height==650)
+   		window.fb_trace = r;
+   	else window.fb_db = r;
+    return r;
+}
 function debug_list()
 {
 	var uri = <?php echo isset($data['data']['uri'])?'"'.$data['data']['uri'].'";':'';?>

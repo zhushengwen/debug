@@ -13,6 +13,7 @@ define('DEBUG_TEMP', getenv('TEMP'));
 define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1));
 
+
 define('FB_DEBUG_FORCE',0);
 define('DEBUG_FB_DIR', dirname(__FILE__));
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
@@ -28,6 +29,7 @@ define('AUTO_FB_COOKIE',DEBUG_FB && 1);
 define('AUTO_FB_COOKIE_ONE',DEBUG_FB && 0);
 define('DB_DEBUG',DEBUG_FB && 1);
 define('FB_DEBUG_ERROR', 0);
+define('FB_RECOND_CONTENT',0);
 
 define('DB_DEBUG_SCRIPT', 'http://'.HTTP_HOST.DEBUG_DIR.'/dev/db-debug.php');
 define('DB_DEBUG_SCRIPT_TIME', DB_DEBUG_SCRIPT.'?time='.XDEBUG_TIME);
@@ -35,9 +37,10 @@ define('DB_DEBUG_ORG', DEBUG_TEMP.'/db-debug.dat');
 define('DB_DEBUG_FILE', DB_DEBUG_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
 define('dg','fb(get_defined_vars());');
+define('DEBUG_REPLAY',isset($_COOKIE['xdebug-replay']));
 
 if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
-
+if(DEBUG_REPLAY)setcookie("xdebug-replay",null,null,'/');
 function debug_dir()
 {
 	$ret = '/debug';
@@ -89,8 +92,8 @@ return true;
 }
 function fd($var)
 {
- file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME.'.log',var_export($var,true)."\r\n",FILE_APPEND);
- file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',XDEBUG_TIME).'.log',var_export($var,true)."\r\n",FILE_APPEND);
+ file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.time().'.log',var_export($var,true)."\r\n",FILE_APPEND);
+ file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',var_export($var,true)."\r\n",FILE_APPEND);
 }
 function fe($a){var_dump($a);exit;}
 #set_error_handler('myErrorHandler123',E_ALL);

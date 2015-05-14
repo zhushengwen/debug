@@ -130,6 +130,11 @@ function db_cleanup()
 	if (DB_DEBUG && DB_DEBUG_FILE && isset($_db['record'])) {
 		file_put_contents(DB_DEBUG_FILE, serialize($_db['record']));
 	}
+	if(DEBUG_REPLAY)
+    {
+    	ob_end_clean();
+    	echo XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME;exit;
+    }
 }
 
 ?>

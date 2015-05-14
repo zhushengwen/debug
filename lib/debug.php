@@ -1295,6 +1295,8 @@ function debug_query($query)
 
 function debug_console($display=false)
 {
+	$content = ob_get_contents();
+    if(FB_RECOND_CONTENT)fd($content);
 	if (defined('DEBUG_CONSOLE_HIDE') && DEBUG_CONSOLE_HIDE) {
 		return;
 	}
@@ -1303,7 +1305,6 @@ function debug_console($display=false)
 	}
     if(defined('DEBUG_CONSOLE') && !DEBUG_CONSOLE) return;
     if(DEBUG_AJAX)return;
-    $content = ob_get_contents();
     if(trim($content)!=''&&stristr($content,'</')===false)return;
 	global $_db, $Db;
 
@@ -1352,18 +1353,18 @@ function debug_console($display=false)
 	$ret .= '<div>';
 	$ret .= '<a href="javascript:debug_cookie_toggle();">'.$hide.'</a> - <a href="javascript:debug_cookie_clear();">clear</a>';
 	if (((defined('DB_DEBUG') && DB_DEBUG) || (defined('DbDebug') && DbDebug)) && defined('DB_DEBUG_SCRIPT_TIME') && $db_enabled) {
-		$ret .= ' - <a href="javascript:void(0)" id="fa_db_'.XDEBUG_TIME.'" onclick="debug_popup(\''.DB_DEBUG_SCRIPT_TIME.'\',800,500)">db-debug ('.$db_cqueries.')</a>';
+		$ret .= ' - <a href="javascript:void(0)" id="fa_db_'.XDEBUG_TIME.'" onclick="debug_popup(\''.DB_DEBUG_SCRIPT_TIME.'\',800,500)">db ('.$db_cqueries.')</a>';
 		$xdebug_sep = true;
 	}
 	if (defined('XDEBUG_TRACE_SCRIPT')) {
 		if (isset($xdebug_sep)) $ret .= ' - ';
 		if (defined('XDEBUG_STARTED')) {
-			$ret .= ' <a href="javascript:void(0)" id="fa_trace_'.XDEBUG_TIME.'" onclick="debug_popup(\''.XDEBUG_TRACE_SCRIPT.'?time='./*filemtime(XDEBUG_XT_FILE.'.xt')*/XDEBUG_TIME.'\', 800,650);">xdebug-trace</a> ';
+			$ret .= ' <a href="javascript:void(0)" id="fa_trace_'.XDEBUG_TIME.'" onclick="debug_popup(\''.XDEBUG_TRACE_SCRIPT.'?time='./*filemtime(XDEBUG_XT_FILE.'.xt')*/XDEBUG_TIME.'\', 800,650);">trace</a> ';
 		} else {
-			$ret .= ' xdebug-trace ';
+			$ret .= ' trace ';
 		}
 		
-		$ret .= '<a class="'.(DEBUG_COOKIE?'stop':'start').'" href="javascript:void(0)" onclick="if(debug_cookie_get(\'xdebug-trace\')) {this.innerHTML=\'[stop]\'; this.className=\'stop\'; debug_cookie_del(\'xdebug-trace\');debug_cookie_clear(); location=location;} else {this.innerHTML=\'[start]\'; this.className=\'start\'; debug_cookie_set(\'xdebug-trace\',1);location=location;}">['.(DEBUG_COOKIE?'stop':'start').']</a>';
+		$ret .= '<a class="'.(DEBUG_COOKIE?'stop':'start').'" href="javascript:void(0)" onclick="if(debug_cookie_get(\'xdebug-trace\')) {this.innerHTML=\'[stop]\'; this.className=\'stop\'; debug_cookie_del(\'xdebug-trace\');debug_cookie_clear(); location.reload();} else {this.innerHTML=\'[start]\'; this.className=\'start\'; debug_cookie_set(\'xdebug-trace\',1);location.reload();}">['.(DEBUG_COOKIE?'stop':'start').']</a>';
 	}
 	$ret .= "</div>";
 	$ret .= '</div>';
