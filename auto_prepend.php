@@ -25,11 +25,11 @@ define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
 
 
 
-define('AUTO_FB_COOKIE',DEBUG_FB && 1);
+define('AUTO_FB_COOKIE',DEBUG_FB);
 define('AUTO_FB_COOKIE_ONE',DEBUG_FB && 0);
-define('DB_DEBUG',DEBUG_FB && 1);
+define('DB_DEBUG',FB_DEBUG_FORCE || (DEBUG_FB && LOCAL));
 define('FB_DEBUG_ERROR', 0);
-define('FB_RECOND_CONTENT',0);
+define('FB_RECOND_CONTENT',FB_DEBUG_FORCE);
 
 define('DB_DEBUG_SCRIPT', 'http://'.HTTP_HOST.DEBUG_DIR.'/dev/db-debug.php');
 define('DB_DEBUG_SCRIPT_TIME', DB_DEBUG_SCRIPT.'?time='.XDEBUG_TIME);
@@ -92,7 +92,7 @@ return true;
 }
 function fd($var)
 {
- file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.time().'.log',var_export($var,true)."\r\n",FILE_APPEND);
+ file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME.'.log',var_export($var,true)."\r\n",FILE_APPEND);
  file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',var_export($var,true)."\r\n",FILE_APPEND);
 }
 function fe($a){var_dump($a);exit;}
@@ -121,7 +121,7 @@ function fr()
     'uri'=>XDEBUG_HTTP_HOST.$_SERVER['REQUEST_URI'],
     'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
   
-  if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir())
+  if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && debug_not_index())
   {
    file_put_contents(DEBUG_TEMP.'/xdebug-trace.html',date('Y-m-d H:i:s',XDEBUG_TIME).'-'.XDEBUG_TIME.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'</a><br/>',FILE_APPEND); 
    if(AUTO_FB_COOKIE)fc($fb_data);
@@ -145,39 +145,41 @@ function fr()
   if($matches && (AUTO_FB_COOKIE_ONE || $_SERVER['FB_COOKIE_DC']-- >0))
       c_c(str_replace('_','.',$matches[0]));
   });
+  if(DEBUG_FB)
+  {
+      $path = dirname(__FILE__).'/lib/debug.php';
+      if(file_exists($path))require_once $path; 
+      if(DB_DEBUG)
+      {
+          $path = dirname(__FILE__).'/lib/db-mysql.php';
+          if(file_exists($path))
+          {
+              require_once $path; 
+              if(AUTOD_FB){
+              $_SERVER['mysql_query']='mysql_query_back';
+              if(!function_exists($_SERVER['mysql_query']))
+              runkit_function_copy('mysql_query',$_SERVER['mysql_query']);
+              runkit_function_redefine('mysql_query','$sql,$con=null','return fb_query($sql,$con);');
+              }else $_SERVER['mysql_query']='mysql_query';
+          }
+    
+      }
+      if ( DEBUG_AJAX ) {
+      }
+      else
+      {
+       register_shutdown_function('debug_console', 1);
+      }
+      fb_debug_start();
+  }
+
 }
 
 
-fr();
 
 
-if(DEBUG_FB)
-{
-    $path = dirname(__FILE__).'/lib/debug.php';
-    if(file_exists($path))require_once $path; 
-    if(DB_DEBUG)
-    {
-        $path = dirname(__FILE__).'/lib/db-mysql.php';
-        if(file_exists($path))
-        {
-            require_once $path; 
-            if(AUTOD_FB){
-            $_SERVER['mysql_query']='mysql_query_back';
-            if(!function_exists($_SERVER['mysql_query']))
-            runkit_function_copy('mysql_query',$_SERVER['mysql_query']);
-            runkit_function_redefine('mysql_query','$sql,$con=null','return fb_query($sql,$con);');
-            }else $_SERVER['mysql_query']='mysql_query';
-        }
-  
-    }
-    if ( DEBUG_AJAX ) {
-    }
-    else
-    {
-     register_shutdown_function('debug_console', 1);
-    }
-    fb_debug_start();
-}
+
+
 function fb_query($sql,$con = null){
   global $_db;
   if (DB_DEBUG) {
@@ -190,9 +192,14 @@ function fb_query($sql,$con = null){
 
 function debug_dev_dir()
 {
-  $script = basename($_SERVER['PHP_SELF']);
-  return in_array($script, array('xdebug-trace.php', 'db-debug.php', 'db-debug-analyze.php'));
+  return strpos($_SERVER['REQUEST_URI'], '/debug/')!==false || !debug_not_index();
 }
+
+function debug_not_index()
+{
+  !in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'));
+}
+fr();
 
 //https://github.com/Crack/runkit-windows/archive/master.zip
 //runkit.internal_override = On
