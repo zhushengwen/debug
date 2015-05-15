@@ -121,7 +121,7 @@ function fr()
     'uri'=>XDEBUG_HTTP_HOST.$_SERVER['REQUEST_URI'],
     'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
   
-  if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && debug_not_index())
+  if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && !debug_index())
   {
    file_put_contents(DEBUG_TEMP.'/xdebug-trace.html',date('Y-m-d H:i:s',XDEBUG_TIME).'-'.XDEBUG_TIME.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'</a><br/>',FILE_APPEND); 
    if(AUTO_FB_COOKIE)fc($fb_data);
@@ -192,12 +192,13 @@ function fb_query($sql,$con = null){
 
 function debug_dev_dir()
 {
-  return strpos($_SERVER['REQUEST_URI'], '/debug/')!==false || !debug_not_index();
+  if(debug_index())return false;
+  return strpos($_SERVER['REQUEST_URI'], '/debug/')!==false;
 }
 
-function debug_not_index()
+function debug_index()
 {
-  !in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'));
+  return in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'));
 }
 fr();
 
