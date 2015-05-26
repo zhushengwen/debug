@@ -684,7 +684,7 @@ function scroll_current_pos()
 <?php $last_depth = null; $last_file = null; $indent = array(); $last_include = ''; $tr_style = ''; $last_tr = ''; $last_tr_depth = 0; $tr_count = 0; $prev_row = null; ?>
 <?php foreach ($parsed_trace as $k => $trace): ?>
 <?php
-
+   if($trace['func'] == 'fb_debug_stop')break;
 	$func_class = '';
 	if ($trace['include']) $func_class = 'include internal';
 	else {
