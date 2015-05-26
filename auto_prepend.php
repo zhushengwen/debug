@@ -90,10 +90,10 @@ $url="[$errno]:$errstr in $file on line $line\r\n";
 file_put_contents(DEBUG_TEMP.'/error.log', $url,FILE_APPEND);
 return true;
 }
-function fd($var)
+function fd($var,$dlog = false)
 {
- file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME.'.log',var_export($var,true)."\r\n",FILE_APPEND);
- file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',var_export($var,true)."\r\n",FILE_APPEND);
+ if($dlog)file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME.'.log',var_export($var,true)."\r\n",FILE_APPEND);
+ else file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',var_export($var,true)."\r\n",FILE_APPEND);
 }
 function fe($a){var_dump($a);exit;}
 #set_error_handler('myErrorHandler123',E_ALL);
@@ -107,7 +107,7 @@ function fe($a){var_dump($a);exit;}
     echo bl_debug();
  }
 
-function fr()
+function frecord()
 {
   $path = DEBUG_FB_DIR .'/fb.php';
   if(file_exists($path) && isset($_SERVER['HTTP_USER_AGENT']) && !(strpos($_SERVER['HTTP_USER_AGENT'],'FirePHP') === false)){
@@ -200,7 +200,7 @@ function debug_index()
 {
   return in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'));
 }
-fr();
-
+frecord();
+//define('APP_DEBUG',1);
 //https://github.com/Crack/runkit-windows/archive/master.zip
 //runkit.internal_override = On

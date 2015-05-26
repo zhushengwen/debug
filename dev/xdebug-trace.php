@@ -485,7 +485,11 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	<a href="javascript:void(0)" onclick="alert($('help').innerHTML.trim());">Help</a>
 	-
 	<a href="javascript:open_db(0);">DB</a>
-	
+	<?php $log = DEBUG_TEMP.'/'.date('Y-m-d',$_GET['time']/100000000).'.log';
+	if(file_exists($log)){ ?>
+	-
+	<a href="notepad2://<?php echo $log.'/?1';?>">Log</a>
+	<?php }?>
 </p>
 <p>
 	<a href="javascript:collapse_all()" id="collapse-all">Collapse all</a>

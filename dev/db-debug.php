@@ -103,6 +103,7 @@ function table_from_query($query)
 
 $data = unserialize(file_get_contents($data_file));
 $queries = array();
+if(isset($data['debug_queries']))
 foreach ($data['debug_queries'] as $k => $row)
 {
 	$query = array();
