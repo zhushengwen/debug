@@ -1296,7 +1296,7 @@ function debug_query($query)
 function debug_console($display=false)
 {
 	$content = ob_get_contents();
-    if(FB_RECOND_CONTENT)fd($content);
+    if(FB_RECOND_CONTENT)fd($content,true);
 	if (defined('DEBUG_CONSOLE_HIDE') && DEBUG_CONSOLE_HIDE) {
 		return;
 	}

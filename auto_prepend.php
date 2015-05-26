@@ -21,6 +21,7 @@ define('HTTP_HOST',isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost
 define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
 define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST.XDEBUG_TRACE_SCRIPT_PATH);
 define('XDEBUG_TIME',(microtime(1)*10000).rand(1000,9999));
+define('XDEBUG_TIME_REAL',intval(XDEBUG_TIME/100000000));
 define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
 
 
@@ -65,7 +66,7 @@ function fa($var){echo "<script>console.log(".json_encode($var).")</script>";}
 
 function fc($var){
 //.mt_rand(1000,9999)
-setcookie(999+(9000 - (intval(XDEBUG_TIME/100000000)%9000)).date('.H:i:s'),json_encode($var),/*XDEBUG_TIME + 60*5*/ null,'/');
+setcookie(999+(9000 - (XDEBUG_TIME_REAL%9000)).date('.H:i:s'),json_encode($var),/*XDEBUG_TIME + 60*5*/ null,'/');
 }
 function c_c($key){
 setcookie($key,null,null,'/');
@@ -123,7 +124,7 @@ function frecord()
   
   if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && !debug_index())
   {
-   file_put_contents(DEBUG_TEMP.'/xdebug-trace.html',date('Y-m-d H:i:s',XDEBUG_TIME).'-'.XDEBUG_TIME.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'</a><br/>',FILE_APPEND); 
+   file_put_contents(DEBUG_TEMP.'/xdebug-trace.html',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'</a><br/>',FILE_APPEND); 
    if(AUTO_FB_COOKIE)fc($fb_data);
    $fb_data['url']=XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME;
     foreach($GLOBALS as $k => $v)
