@@ -24,7 +24,6 @@ if (!defined('DB_DEBUG_FILE')) define('DB_DEBUG_FILE',0);
 if (!extension_loaded('mysql')) {
 	trigger_error('mysql extension not loaded', E_USER_ERROR);
 }
-register_shutdown_function('db_cleanup');
 
 if (ini_get('magic_quotes_gpc')) {
 	ini_set('magic_quotes_runtime', 0);
@@ -121,20 +120,6 @@ function db_magic_quotes_gpc(&$val)
 // -------- inicjalizacja / porzadki po zakonczeniu wykonywania skryptu
 
 
-function db_cleanup()
-{
-	static $called = false;
-	if ($called) return;
-	else $called = true;
-	global $_db;
-	if (DB_DEBUG && DB_DEBUG_FILE && !debug_dev_dir() && isset($_db['record'])) {
-		file_put_contents(DB_DEBUG_FILE, serialize($_db['record']));
-	}
-	if(DEBUG_REPLAY)
-    {
-    	ob_end_clean();
-    	echo XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME;exit;
-    }
-}
+
 
 ?>

@@ -8,7 +8,7 @@ ini_set('log_errors', 1);
 ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
 //ini_set('html_errors', 0);
 ini_set('date.timezone', 'Asia/Shanghai');
-
+register_shutdown_function('data_cleanup');
 if(FB_DEBUG_ERROR)set_error_handler('debug_error');
 function debug_record()
 {
@@ -36,7 +36,7 @@ function debug_error($error_no, $error_msg, $error_file, $error_line, $error_con
 	}
 
 	// register_shutdown_function() bug, after exit on php5 win32, shutdown function is not called
-	if (function_exists('db_cleanup')) db_cleanup();
+	if (function_exists('data_cleanup')) data_cleanup();
 
 	// Use output buffering in your controller, so we can cancel any content already generated.
 	debug_ob_cleanup();
@@ -1501,5 +1501,24 @@ function fb_debug_stop()
 		xdebug_stop_trace();
 	}
 }
-
+function data_cleanup()
+{
+	static $called = false;
+	if ($called) return;
+	else $called = true;
+	global $_db;
+	if (DB_DEBUG && DB_DEBUG_FILE && !debug_dev_dir() && isset($_db['record'])) {
+		file_put_contents(DB_DEBUG_FILE, serialize($_db['record']));
+	}
+	if(DEBUG_REPLAY)
+	{
+		ob_end_clean();
+		echo '<url>'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'</url>';exit;
+	}
+	if(!DEBUG_AJAX && DEBUG_FB)
+	{
+	    fb_debug_stop();
+	    echo debug_console();
+	}
+}
 ?>

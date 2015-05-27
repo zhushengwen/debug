@@ -795,6 +795,11 @@ var ajax = <?php echo $is_ajax;?>;
 var method = '<?php echo $re_method;?>';
 var d = '<?php echo $req_data;?>';
 debug_cookie_set('xdebug-replay','1');
+function getUrl(str){
+		var s= str.indexOf('<url>')+5;
+		var e= str.indexOf('</url>');
+		return str.substring(s,e);
+}
 if(!ajax){
 	if(!window.replay_form)
 	{
@@ -809,16 +814,14 @@ if(!ajax){
 		ifm.name="replay_frm";
 		ifm.style.display="none";
 		document.body.appendChild(ifm);
-
+		var load=function(){ 
+		debug_popup(getUrl(ifm.contentWindow.document.body.innerHTML)); 
+		}
 		if(ifm.attachEvent){
-		ifm.attachEvent("onload", function(){ 
-		var str = ifm.contentWindow; 
-		debug_popup(str.document.body.innerHTML); 
-		})}else{
-		ifm.onload = function(){ 
-		var str = ifm.contentWindow; 
-		debug_popup(str.document.body.innerHTML); 
-		}}   
+		ifm.attachEvent("onload", load);
+		}else{
+		ifm.onload = load;
+	   	}   
 
 
 	    var ar=d.split('&');
@@ -840,7 +843,9 @@ if(!ajax){
 var p = <?php echo $is_post;?>;
 var r = new(self.XMLHttpRequest||ActiveXObject)("Microsoft.XMLHTTP");
 r.onreadystatechange = function() {
-	if (r.readyState == 4 && r.status == 200){debug_popup(r.responseText);}
+	if (r.readyState == 4 && r.status == 200){
+		debug_popup(getUrl(r.responseText));
+	}
 }
 if(p){
 	r.open('POST', l, true);

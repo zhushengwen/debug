@@ -14,7 +14,7 @@ define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1));
 
 
-define('FB_DEBUG_FORCE',0);
+define('FB_DEBUG_FORCE',1);
 define('DEBUG_FB_DIR', dirname(__FILE__));
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
 define('HTTP_HOST',isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost');
@@ -164,12 +164,6 @@ function frecord()
               }else $_SERVER['mysql_query']='mysql_query';
           }
     
-      }
-      if ( DEBUG_AJAX ) {
-      }
-      else
-      {
-       register_shutdown_function('debug_console', 1);
       }
       fb_debug_start();
   }
