@@ -904,6 +904,27 @@ function debug_popup(url, width, height, more)
    	else window.fb_db = r;
     return r;
 }
+function debug_cookie_del(name, path)
+{
+    var cookie = (name + '=');
+    path = path ? path : '/';
+    if (path) cookie += '; path='+path;
+    cookie += '; expires=Thu, 01-Jan-70 00:00:01 GMT';
+    document.cookie = cookie;
+}
+function debug_cookie_clear()
+{
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; ++i) {
+        var a = cookies[i].split('=');
+        if (a.length == 2) {
+            a[0] = a[0].replace(/^\s*|\s*$/g, '');
+            a[1] = a[1].replace(/^\s*|\s*$/g, '');
+            if(/^\d{4}\.\d{2}:\d{2}:\d{2}$/.test(a[0])) debug_cookie_del(a[0]);
+        }
+    }
+    debug_list();
+}
 function debug_list()
 {
 	var uri = <?php echo isset($data['data']['uri'])?'"'.$data['data']['uri'].'";':'';?>
@@ -919,7 +940,7 @@ function debug_list()
         }
     }
 	
-	var html = '<div>DebugList -- Count('+list.length+')</div>';
+	var html = '<div>DebugList -<a href="javascript:debug_cookie_clear();">clear</a>- Count('+list.length+')</div>';
 	for(var i=list.length-1;i>=0;i--)
 	{
 		var s = list[i].uri;
