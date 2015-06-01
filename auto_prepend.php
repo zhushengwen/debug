@@ -2,7 +2,7 @@
 //require dirname(__FILE__).'/debug/auto_prepend.php';
 date_default_timezone_set("Asia/Shanghai");
 ob_start();
-define('DEBUG_FB',1);
+define('DEBUG_FB',0);
 define('IS_GBK',0);
 defined('DEBUG_CONSOLE_HIDE');
 //define('DEBUG_CONSOLE_HIDE',1);
