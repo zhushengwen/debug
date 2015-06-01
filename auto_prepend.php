@@ -14,7 +14,7 @@ define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1));
 
 
-define('FB_DEBUG_FORCE',1);
+define('FB_DEBUG_FORCE',0);
 define('DEBUG_FB_DIR', dirname(__FILE__));
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
 define('HTTP_HOST',isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost');
@@ -129,16 +129,15 @@ function frecord()
    $fb_data['url']=XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME;
     foreach($GLOBALS as $k => $v)
     {
-        if(!in_array($k, array('GLOBALS','_db')))
+        if(!in_array($k, array('GLOBALS','_db','_COOKIE')))
         {
             $re['$'.$k]=$v;
         }
     }
     $fb_data['GLOBALS'] = $re;
   }   
-    
-    global $_db;
-    $_db['record']['data'] = $fb_data;
+  global $_db;
+  $_db['record']['data'] = $fb_data;
 
   $_SERVER['FB_COOKIE_DC'] = count($_COOKIE) - 20;
   array_walk($_COOKIE,function($val,$key){
@@ -167,16 +166,23 @@ function frecord()
       }
       fb_debug_start();
   }
-
+  return $fb_data;
 }
 
 
 
+function fb_sql($sql,$time=0,$data='')
+{
+    global $_db;
+    db_empty($_db['debug_count']+1,$sql);
+    return db_add_sql($sql,$time,$data);
 
+}
 
 
 function fb_query($sql,$con = null){
   global $_db;
+
   if (DB_DEBUG) {
     db_empty($_db['debug_count']+1,$sql);
   }
@@ -195,6 +201,7 @@ function debug_index()
 {
   return in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'));
 }
+
 frecord();
 //define('APP_DEBUG',1);
 //https://github.com/Crack/runkit-windows/archive/master.zip

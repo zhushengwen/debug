@@ -4,18 +4,6 @@
 	Author: Cezary Tomczak [www.gosu.pl]
 */
 
-global $_db;
-if(!$_db)$_db = array();
-$_db = array_merge($_db, array(
-	'link' => null,
-	'dbname' => null,
-	'transaction_level' => 0,
-	'debug_file' => '',
-	'debug_queries' => array(),
-	'debug_count' => null,
-	'debug_time' => null,
-));
-
 if (!defined('DB_DETECT_MISSING_WHERE')) define('DB_DETECT_MISSING_WHERE',0);
 if (!defined('DB_DETECT_INJECTION')) define('DB_DETECT_INJECTION',0);
 if (!defined('DB_DEBUG')) define('DB_DEBUG',0);
@@ -42,12 +30,33 @@ if (DB_DETECT_INJECTION) {
 
 // -------- podstawowe funkcje: db_query() db_one() db_row() db_list() db_assoc()
 function db_empty($id,$sql){}
+function db_add_sql($sql,$time,$data){
+	global $_db;
+	if (DB_DEBUG) {
+		//$microstart = microtime(true);if(function_exists('fb_sql'))fb_sql($sql,microtime(true)-$microstart,$result);
+			$rows = array();
+			$fids = array();
+			if($data) 
+			{
+				$fids = array_keys($data[0]);
+				foreach ($data as $key => $value) {
+					$d=array();
+					foreach ($value as $k => $v) {
+						$d[] = $v;
+					}
+					$rows[] = $d;
+				}
+				$data = array('fids'=>$fids,'rows'=>$rows);
+			}
+
+		$_db['record']['debug_queries'][] = array('query'=>$sql, 'time'=>$time ,'seq'=>$_db['debug_count']+1,'data' => $data?json_encode($data):'');
+		$_db['debug_count']++; $_db['debug_time'] += $time;
+	}
+}
 function db_query($query,$con)
 {
 	global $_db;
 
-	if (DB_DETECT_MISSING_WHERE) db_detect_missing_where($query);
-	if (DB_DETECT_INJECTION) db_detect_injection($query);
 	if (DB_DEBUG) $microstart = microtime(true);
     $result = $con?$_SERVER['mysql_query']($query, $con):$_SERVER['mysql_query']($query);
 	if (DB_DEBUG) {

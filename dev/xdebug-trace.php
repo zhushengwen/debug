@@ -864,7 +864,7 @@ else{
 </script>
 <?php  }?>
 <div style="clear:both;"></div>
-<?php krumo($data,'DataView');?>
+<?php krumo($data['data'],'DataView');?>
 <a id="summary" name="summary"></a>
 <h2 style="float:left;">Summary</h2>
 <a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="history.go(-1);window.scrollTo(0,0);">Up</a>
