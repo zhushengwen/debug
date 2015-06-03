@@ -2,7 +2,7 @@
 //require dirname(__FILE__).'/debug/auto_prepend.php';
 date_default_timezone_set("Asia/Shanghai");
 ob_start();
-define('DEBUG_FB',0);
+define('DEBUG_FB',1);
 define('IS_GBK',0);
 defined('DEBUG_CONSOLE_HIDE');
 //define('DEBUG_CONSOLE_HIDE',1);
@@ -11,10 +11,10 @@ define('LOCAL',isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_
 define('DEBUG_DIR', debug_dir());
 define('DEBUG_TEMP', getenv('TEMP'));
 define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0);
-define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1));
-
 
 define('FB_DEBUG_FORCE',0);
+define('DEBUG_SHOW_FORCE',0);
+define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
 define('DEBUG_FB_DIR', dirname(__FILE__));
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
 define('HTTP_HOST',isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost');
@@ -23,7 +23,6 @@ define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST.XDEBUG_TRACE_SCRIPT_PATH);
 define('XDEBUG_TIME',(microtime(1)*10000).rand(1000,9999));
 define('XDEBUG_TIME_REAL',intval(XDEBUG_TIME/100000000));
 define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
-
 
 
 define('AUTO_FB_COOKIE',DEBUG_FB);
@@ -173,10 +172,11 @@ function frecord()
 
 function fb_sql($sql,$time=0,$data='')
 {
+  if (DB_DEBUG) {
     global $_db;
     db_empty($_db['debug_count']+1,$sql);
-    return db_add_sql($sql,$time,$data);
-
+    db_add_sql($sql,$time,$data);
+   }
 }
 
 
@@ -201,6 +201,7 @@ function debug_index()
 {
   return in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'));
 }
+
 
 frecord();
 //define('APP_DEBUG',1);
