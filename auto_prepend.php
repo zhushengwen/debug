@@ -126,7 +126,7 @@ function frecord()
   
   if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && !debug_index())
   {
-   file_put_contents(DEBUG_LIST_FILE,date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'('.$_SERVER["HTTP_HOST"].')'.'</a><br/>',FILE_APPEND); 
+   file_put_contents(DEBUG_LIST_FILE,date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'<font color="black">('.$_SERVER["HTTP_HOST"].')</font>'.'</a><br/>',FILE_APPEND); 
    if(AUTO_FB_COOKIE)fc($fb_data);
    $fb_data['url']=XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME;
     foreach($GLOBALS as $k => $v)
