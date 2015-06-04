@@ -488,12 +488,12 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	<?php $log = DEBUG_TEMP.'/'.date('Y-m-d',$_GET['time']/100000000).'.log';
 	if(file_exists($log)){ ?>
 	-
-	<a href="notepad2://<?php echo $log.'/?1';?>">Log</a>
+	<a target="_blank" href="../index.php?timelog=<?php echo $_GET['time'];?>">Log</a>
 	<?php }?>
 	<?php $log = DEBUG_TEMP.'/xdebug-trace.'.$_GET['time'].'.log';
 	if(file_exists($log)){ ?>
 	-
-	<a href="notepad2://<?php echo $log.'/?1';?>">OutLog</a>
+	<a target="_blank" href="../index.php?timeoutlog=<?php echo $_GET['time'];?>">OutLog</a>
 	<?php }?>
 </p>
 <p>
