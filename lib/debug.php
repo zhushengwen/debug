@@ -1290,13 +1290,13 @@ function debug_query($query)
 	return debug_pre($query, '', 12, 'white-space: normal; max-height: 178px; overflow: auto;');
 }
 
+
 // -------- debug console
 
 
 function debug_console($display=false)
 {
-	$content = ob_get_contents();
-    if(FB_RECOND_CONTENT)fd($content,true);
+
 	if (defined('DEBUG_CONSOLE_HIDE') && DEBUG_CONSOLE_HIDE) {
 		return;
 	}
@@ -1305,7 +1305,7 @@ function debug_console($display=false)
 	}
     if(defined('DEBUG_CONSOLE') && !DEBUG_CONSOLE) return;
     if(DEBUG_AJAX)return;
-    if(trim($content)!=''&&stristr($content,'</')===false)return;
+    
 	global $_db, $Db;
 
 	$db_time = null;

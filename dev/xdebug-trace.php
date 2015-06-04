@@ -764,6 +764,7 @@ function scroll_current_pos()
 	$summary = array_msort($summary, array('count'=>SORT_DESC, 'func'=>SORT_ASC));
 ?>
 <?php 
+
 $debug_time = isset($_GET['time'])?$_GET['time']:$_SERVER['QUERY_STRING'];
 $data_file = DB_DEBUG_ORG.'.'.$debug_time;
 if (file_exists($data_file)) {
@@ -783,12 +784,7 @@ if (file_exists($data_file)) {
 <h2 style="float:left;"><?php echo $method.' : <a target="_blank" style="color:black;" href="'.$uri.'">'.$uri.'</a>';?></h2>
 <a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="redo();">Replay</a>
 <script>
-function debug_cookie_set(name, value)
-{
-    var cookie = (name + '=' + escape(value));
-    cookie += '; path=/';
-    document.cookie = cookie;
-}
+
 function redo(){
 var l = '<?php echo $uri;?>';
 var ajax = <?php echo $is_ajax;?>;
@@ -862,12 +858,13 @@ else{
 
 }
 </script>
-<?php  }?>
 <div style="clear:both;"></div>
-<?php krumo($data['data'],'DataView');?>
+<?php krumo($data['data']['GLOBALS'],'GLOBALS');?>
+<?php  }?>
 <a id="summary" name="summary"></a>
 <h2 style="float:left;">Summary</h2>
 <a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="history.go(-1);window.scrollTo(0,0);">Up</a>
+
 <div style="clear:both;"></div>
 <table cellspacing="1">
 <tr>
@@ -892,6 +889,12 @@ else{
 <?php endif; ?>
 </body>
 <script>
+function debug_cookie_set(name, value)
+{
+    var cookie = (name + '=' + escape(value));
+    cookie += '; path=/';
+    document.cookie = cookie;
+}
 function debug_popup(url, width, height, more)
 {
     if (!width) width = 800;
@@ -927,7 +930,7 @@ function debug_cookie_clear()
 }
 function debug_list()
 {
-	var uri = <?php echo isset($data['data']['uri'])?'"'.$data['data']['uri'].'";':'';?>
+	var uri = "<?php echo isset($data['data']['uri'])?$data['data']['uri']:'';?>";
 	var list = [];
 	var cookies = document.cookie.split(';');
     for (var i = 0; i < cookies.length; ++i) {

@@ -14,7 +14,7 @@ define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0
 define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
 define('DEBUG_FORCE_FAIL',file_exists(DEBUG_LIST_FILE) && time()-filectime(DEBUG_LIST_FILE)>1200);
 
-define('FB_DEBUG_FORCE',!DEBUG_FORCE_FAIL && 1 );
+define('FB_DEBUG_FORCE',!DEBUG_FORCE_FAIL && 0 );
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
 define('DEBUG_FB_DIR', dirname(__FILE__));
@@ -204,6 +204,8 @@ function debug_index()
 {
   return in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'));
 }
+
+
 function data_cleanup()
 {
 
@@ -211,10 +213,12 @@ function data_cleanup()
   if ($called) return;
   else $called = true;
   global $_db;
-  
+
   if (DB_DEBUG && DB_DEBUG_FILE && !debug_dev_dir() && isset($_db['record'])) {
     file_put_contents(DB_DEBUG_FILE, serialize($_db['record']));
   }
+  $content = ob_get_contents();
+  if(FB_RECOND_CONTENT)fd($content,true);
   if(DEBUG_REPLAY)
   {
     ob_end_clean();
@@ -223,6 +227,7 @@ function data_cleanup()
   if(!DEBUG_AJAX && DEBUG_FB)
   {
       fb_debug_stop();
+      if(trim($content)!=''&&stristr($content,'</')===false)return;
       echo debug_console();
   }
 }
