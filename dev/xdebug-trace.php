@@ -490,7 +490,7 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	-
 	<a href="notepad2://<?php echo $log.'/?1';?>">Log</a>
 	<?php }?>
-	<?php $log = DEBUG_TEMP.'/'.$_GET['time'].'.log';
+	<?php $log = DEBUG_TEMP.'/xdebug-trace.'.$_GET['time'].'.log';
 	if(file_exists($log)){ ?>
 	-
 	<a href="notepad2://<?php echo $log.'/?1';?>">OutLog</a>
