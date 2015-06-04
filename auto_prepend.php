@@ -19,7 +19,7 @@ define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
 define('DEBUG_FB_DIR', dirname(__FILE__));
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
-define('HTTP_HOST',isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost');
+define('HTTP_HOST',isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']: (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost'));
 define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
 define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST.XDEBUG_TRACE_SCRIPT_PATH);
 define('XDEBUG_TIME',(microtime(1)*10000).rand(1000,9999));
@@ -204,7 +204,28 @@ function debug_index()
 {
   return in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'));
 }
+function data_cleanup()
+{
 
+  static $called = false;
+  if ($called) return;
+  else $called = true;
+  global $_db;
+  
+  if (DB_DEBUG && DB_DEBUG_FILE && !debug_dev_dir() && isset($_db['record'])) {
+    file_put_contents(DB_DEBUG_FILE, serialize($_db['record']));
+  }
+  if(DEBUG_REPLAY)
+  {
+    ob_end_clean();
+    echo '<url>'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'</url>';exit;
+  }
+  if(!DEBUG_AJAX && DEBUG_FB)
+  {
+      fb_debug_stop();
+      echo debug_console();
+  }
+}
 
 frecord();
 //define('APP_DEBUG',1);
