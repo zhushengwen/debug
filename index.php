@@ -1,4 +1,5 @@
 <?php
+header("Content-type: text/html; charset=utf-8");
 if(isset($_GET['timelog']))
 {
 	$log = DEBUG_TEMP.'/'.date('Y-m-d',$_GET['timelog']/100000000).'.log';
