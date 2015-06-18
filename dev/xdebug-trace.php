@@ -441,7 +441,7 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	span.user-defined { color:#2B2B99; }
 	.debug_console { position: fixed; bottom: 0.5em; right: 0.5em; color: #666; z-index: 50000; text-align: left; background: #f5f5f5; padding: 0.25em 0.5em; border: #ccc 1px solid; border-style: solid none none solid; font: normal 11px/16px "Lucida Grande", Verdana, Arial, "Bitstream Vera Sans", sans-serif; text-decoration: none; padding: 2px 8px !important; border: 1px solid #bbb;	-moz-border-radius: 11px; -khtml-border-radius: 11px; -webkit-border-radius: 11px; border-radius: 11px; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; -khtml-box-sizing: content-box; box-sizing: content-box; color: #464646;}
 	.debug_console div { margin: 0.1em 0em; }
-	.debug_console a { text-decoration: none; color: #21759b; }
+	.debug_console a { display: inline; text-decoration: none; color: #21759b; }
 	.debug_console a.start { }
 	.debug_console a.stop { color: #d54e21; }
 	</style>
