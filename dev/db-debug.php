@@ -21,7 +21,7 @@ if (!preg_match('#^\d+(\.\d+)?$#', $get['id'])) {
 }
 */
 $debug_time = isset($_GET['time'])?$_GET['time']:$_SERVER['QUERY_STRING'];
-$data_file = DB_DEBUG_ORG.'.'.$debug_time;
+$data_file = DEBUG_FDB_ORG.'.'.$debug_time;
 
 /*
 preg_match('#^\d+#', $get['id'], $match);

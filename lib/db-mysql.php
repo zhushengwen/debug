@@ -13,8 +13,8 @@ $_db = array_merge($_db, array(
 ));
 if (!defined('DB_DETECT_MISSING_WHERE')) define('DB_DETECT_MISSING_WHERE',0);
 if (!defined('DB_DETECT_INJECTION')) define('DB_DETECT_INJECTION',0);
-if (!defined('DB_DEBUG')) define('DB_DEBUG',0);
-if (!defined('DB_DEBUG_FILE')) define('DB_DEBUG_FILE',0);
+if (!defined('DEBUG_FDB')) define('DEBUG_FDB',0);
+if (!defined('DEBUG_FDB_FILE')) define('DEBUG_FDB_FILE',0);
 
 if (!extension_loaded('mysql')) {
 	trigger_error('mysql extension not loaded', E_USER_ERROR);
@@ -39,7 +39,7 @@ if (DB_DETECT_INJECTION) {
 function db_empty($id,$sql){}
 function db_add_sql($sql,$time,$data){
 	global $_db;
-	if (DB_DEBUG) {
+	if (DEBUG_FDB) {
 		//$microstart = microtime(true);if(function_exists('fb_sql'))fb_sql($sql,microtime(true)-$microstart,$result);
 			$rows = array();
 			$fids = array();
@@ -64,9 +64,9 @@ function db_query($query,$con)
 {
 	global $_db;
 
-	if (DB_DEBUG) $microstart = microtime(true);
+	if (DEBUG_FDB) $microstart = microtime(true);
     $result = $con?$_SERVER['mysql_query']($query, $con):$_SERVER['mysql_query']($query);
-	if (DB_DEBUG) {
+	if (DEBUG_FDB) {
 		$time = microtime(true)-$microstart;
 		$_db['record']['debug_queries'][] = array('query'=>$query, 'time'=>$time ,'seq'=>$_db['debug_count']+1,'data' => json_encode(is_resource($result)?db_result($result):''));
 		$_db['debug_count']++; $_db['debug_time'] += $time;

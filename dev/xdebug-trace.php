@@ -608,7 +608,7 @@ function open_db(id){
 		}else{
 			var regr = /^.*time=(\d{18}).*$/.exec(location.href);
 			if(regr){
-				this.fb_db = debug_popup("<?php echo DB_DEBUG_SCRIPT.'?time=';?>"+regr[1],800,500);
+				this.fb_db = debug_popup("<?php echo DEBUG_FDB_SCRIPT.'?time=';?>"+regr[1],800,500);
 				this.fb_db.onload = function (){
 								this.open_db(id);
 				}
@@ -766,7 +766,7 @@ function scroll_current_pos()
 <?php 
 
 $debug_time = isset($_GET['time'])?$_GET['time']:$_SERVER['QUERY_STRING'];
-$data_file = DB_DEBUG_ORG.'.'.$debug_time;
+$data_file = DEBUG_FDB_ORG.'.'.$debug_time;
 if (file_exists($data_file)) {
 	include_once './krumo/class.krumo.php';
 	$data = unserialize(file_get_contents($data_file));

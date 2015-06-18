@@ -1352,8 +1352,8 @@ function debug_console($display=false)
 
 	$ret .= '<div>';
 	$ret .= '<a href="javascript:debug_cookie_toggle();">'.$hide.'</a> - <a href="javascript:debug_cookie_clear();">clear</a>';
-	if (((defined('DB_DEBUG') && DB_DEBUG) || (defined('DbDebug') && DbDebug)) && defined('DB_DEBUG_SCRIPT_TIME') && $db_enabled) {
-		$ret .= ' - <a href="javascript:void(0)" id="fa_db_'.XDEBUG_TIME.'" onclick="debug_popup(\''.DB_DEBUG_SCRIPT_TIME.'\',800,500)">db ('.$db_cqueries.')</a>';
+	if (((defined('DEBUG_FDB') && DEBUG_FDB) || (defined('DbDebug') && DbDebug)) && defined('DEBUG_FDB_SCRIPT_TIME') && $db_enabled) {
+		$ret .= ' - <a href="javascript:void(0)" id="fa_db_'.XDEBUG_TIME.'" onclick="debug_popup(\''.DEBUG_FDB_SCRIPT_TIME.'\',800,500)">db ('.$db_cqueries.')</a>';
 		$xdebug_sep = true;
 	}
 	if (defined('XDEBUG_TRACE_SCRIPT')) {

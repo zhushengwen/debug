@@ -29,14 +29,14 @@ define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
 
 define('AUTO_FB_COOKIE',DEBUG_FB);
 define('AUTO_FB_COOKIE_ONE',DEBUG_FB && 0);
-define('DB_DEBUG',FB_DEBUG_FORCE || (DEBUG_FB && LOCAL));
+define('DEBUG_FDB',FB_DEBUG_FORCE || (DEBUG_FB && LOCAL));
 define('FB_DEBUG_ERROR', 0);
 define('FB_RECOND_CONTENT',FB_DEBUG_FORCE);
 
-define('DB_DEBUG_SCRIPT', 'http://'.HTTP_HOST.DEBUG_DIR.'/dev/db-debug.php');
-define('DB_DEBUG_SCRIPT_TIME', DB_DEBUG_SCRIPT.'?time='.XDEBUG_TIME);
-define('DB_DEBUG_ORG', DEBUG_TEMP.'/db-debug.dat');
-define('DB_DEBUG_FILE', DB_DEBUG_ORG.'.'.XDEBUG_TIME);
+define('DEBUG_FDB_SCRIPT', 'http://'.HTTP_HOST.DEBUG_DIR.'/dev/db-debug.php');
+define('DEBUG_FDB_SCRIPT_TIME', DEBUG_FDB_SCRIPT.'?time='.XDEBUG_TIME);
+define('DEBUG_FDB_ORG', DEBUG_TEMP.'/db-debug.dat');
+define('DEBUG_FDB_FILE', DEBUG_FDB_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
 define('dg','fb(get_defined_vars());');
 define('DEBUG_REPLAY',isset($_COOKIE['xdebug-replay']));
@@ -151,7 +151,7 @@ function frecord()
   {
       $path = dirname(__FILE__).'/lib/debug.php';
       if(file_exists($path))require_once $path; 
-      if(DB_DEBUG)
+      if(DEBUG_FDB)
       {
           $path = dirname(__FILE__).'/lib/db-mysql.php';
           if(file_exists($path))
@@ -175,7 +175,7 @@ function frecord()
 
 function fb_sql($sql,$time=0,$data='')
 {
-  if (DB_DEBUG) {
+  if (DEBUG_FDB) {
     global $_db;
     db_empty($_db['debug_count']+1,$sql);
     db_add_sql($sql,$time,$data);
@@ -186,7 +186,7 @@ function fb_sql($sql,$time=0,$data='')
 function fb_query($sql,$con = null){
   global $_db;
 
-  if (DB_DEBUG) {
+  if (DEBUG_FDB) {
     db_empty($_db['debug_count']+1,$sql);
   }
   if(function_exists('db_query'))return db_query($sql,$con);
@@ -214,8 +214,8 @@ function data_cleanup()
   else $called = true;
   global $_db;
 
-  if (DB_DEBUG && DB_DEBUG_FILE && !debug_dev_dir() && isset($_db['record'])) {
-    file_put_contents(DB_DEBUG_FILE, serialize($_db['record']));
+  if (DEBUG_FDB && DEBUG_FDB_FILE && !debug_dev_dir() && isset($_db['record'])) {
+    file_put_contents(DEBUG_FDB_FILE, serialize($_db['record']));
   }
   $content = ob_get_contents();
   if(FB_RECOND_CONTENT)fd($content,true);
