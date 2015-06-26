@@ -80,6 +80,7 @@ function db_result($result)
 	$fids = array();
 	while ($property = mysql_fetch_field($result)) $fids[] = $property->name;
 	while ($row = mysql_fetch_row($result)) $rows[] = $row;
+	@mysql_field_seek($result, 0);
 	if($rows)@mysql_data_seek($result, 0);
 	return array('fids'=>$fids,'rows'=>$rows);
 }
