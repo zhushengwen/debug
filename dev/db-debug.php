@@ -5,7 +5,7 @@ ini_set('display_errors', true);
 ini_set('log_errors', 1);
 ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
 ini_set('html_errors', 0);
-ini_set('date.timezone', 'Asia/Shanghai');
+
 
 
 

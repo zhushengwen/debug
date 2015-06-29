@@ -8,7 +8,7 @@ defined('DEBUG_CONSOLE_HIDE');
 //define('DEBUG_CONSOLE_HIDE',1);
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('LOCAL',isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR'])==$_SERVER['REMOTE_ADDR']);
-define('DEBUG_DIR', debug_dir());
+define('DEBUG_DIR', fb_debug_dir());
 define('DEBUG_TEMP', getenv('TEMP'));
 define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0);
 define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
@@ -44,7 +44,7 @@ define('DEBUG_REPLAY',isset($_COOKIE['xdebug-replay']));
 
 if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
 if(DEBUG_REPLAY)setcookie("xdebug-replay",null,null,'/');
-function debug_dir()
+function fb_debug_dir()
 {
 	$ret = '/debug';
 	$root = $_SERVER['DOCUMENT_ROOT'];
