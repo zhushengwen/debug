@@ -679,7 +679,7 @@ function scroll_current_pos()
 	return 0;
 }
 </script>
-<?php if ($show_debug): ?>
+<?php if ($xthandle): ?>
 <table cellspacing="1" id="mtable">
 <tr>
 	<th>#</th>
