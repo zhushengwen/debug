@@ -121,7 +121,7 @@ function frecord()
   $fb_data = array('method'=>(DEBUG_AJAX?'ajax_':'').$_SERVER['REQUEST_METHOD'],
     'uri'=>XDEBUG_HTTP_HOST.$_SERVER['REQUEST_URI'],
     'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
-  define('FB_HIST_LOG',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" title="'.$_SERVER['REMOTE_ADDR'].'" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'<font color="black">('.$_SERVER["HTTP_HOST"].')</font>'.'</a><br/>');
+  define('FB_HIST_LOG',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" title="'.$_SERVER['REMOTE_ADDR'].'" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'</a>('.$_SERVER["HTTP_HOST"].'-<a target="_blank" href="https://www.baidu.com/s?wd='.$_SERVER['REMOTE_ADDR'].'" ><font color="darkblue">'.$_SERVER['REMOTE_ADDR'].'</font></a>)<br/>');
   if(!FB_DEBUG_INDEX)file_put_contents(DEBUG_HIST_FILE,FB_HIST_LOG,FILE_APPEND); 
   if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && !debug_index())
   {
