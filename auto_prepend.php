@@ -213,7 +213,7 @@ function data_cleanup()
   if ($called) return;
   else $called = true;
   global $_db;
-  if (DEBUG_FDB && DEBUG_FDB_FILE && !debug_dev_dir() && isset($_db['record'])) {
+  if (DEBUG_FDB_FILE && !debug_dev_dir()) {
     $_db['record']['data'] = $_SERVER['FB_GLO_DATA'];
     file_put_contents(DEBUG_FDB_FILE, serialize($_db['record']));
   }
