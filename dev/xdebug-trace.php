@@ -43,6 +43,7 @@ function _debug()
 }
 $gtime =$_GET['time'];
 $trace_xt = DEBUG_TEMP."/xdebug-trace.$gtime.xt";
+$data_xt = DEBUG_TEMP."/db-debug.dat.$gtime";
 $group_nested = get('group-nested', 'bool');
 
 $total_calls = 0;
@@ -72,101 +73,131 @@ $real_total_memory = 0;
 $max_depth = 0;
 
 $xthandle = fopen($trace_xt, 'r');
-if (!$xthandle) exit('Debug File No Found: '.$trace_xt);
+if (!$xthandle&&!file_exists($data_xt)) exit('Debug File No Found: '.'<br/>'.$trace_xt.'<br/>'.$data_xt);
 
 $next_line = rtrim(fgets($xthandle,512));
 $chunked_trace = array();
-
-while (!feof($xthandle))
+if($xthandle)
 {
-	$line = $next_line;
-	$next_line = rtrim(fgets($xthandle));
-
-	if (isset($next)) {
-		$row = $next;
-	} else {
-		$row = parse_line($line);
-	}
-	if (!$row) continue;
-	if ($first_row) { $first_row = false; $prev = $row; continue; }
-	if ('xdebug_stop_trace' == $row['func']) break;
-
-	if ($row['func'])
+	while (!feof($xthandle))
 	{
-		$total_calls++;
-		$next = parse_line($next_line);
+		$line = $next_line;
+		$next_line = rtrim(fgets($xthandle));
 
-		$func = $row;
-		$func['time'] = bcsub($row['time'], $prev['time'], 6);
-		$func['memory'] = $row['memory'] - $prev['memory'];
-		if ($func['memory'] < 0) $func['memory'] = 0;
-		$func['is_nested'] = $next['depth'] > $func['depth'];
-
-		if ($func['depth'] > $max_depth) $max_depth = $func['depth'];
-
-		//show_headers:
-		//$func['prev_depth'] = $prev_func['depth'];
-		//$func['prev_func'] = $prev_func['func'];
-		//$func['prev_include'] = $prev_func['include'];
-		//$func['prev_file'] = $prev_func['file'];
-		//$func['parent_func'] = $parent_func[$func['depth']];
-
-		if ($prev_func['func'] && ($prev_func['depth'] != $row['depth'])) {
-			foreach ($chunked_trace as $tmp_func) {
-				$parsed_trace[] = $tmp_func;
-			}
-			$chunked_trace = array();
-		}
-
-		if ($func['is_nested'] || $func['include']) {
-			$chunked_trace[] = $func;
-		} else if (isset($chunked_trace[$func['func']])) {
-			$chunked_trace[$func['func']]['func_count']++;
-			$chunked_trace[$func['func']]['time'] = bcadd($chunked_trace[$func['func']]['time'], $func['time'], 6);
-			$chunked_trace[$func['func']]['memory'] += $func['memory'];
+		if (isset($next)) {
+			$row = $next;
 		} else {
-			$chunked_trace[$func['func']] = $func;
+			$row = parse_line($line);
+		}
+		if (!$row) continue;
+		if ($first_row) { $first_row = false; $prev = $row; continue; }
+		if ('xdebug_stop_trace' == $row['func']) break;
+
+		if ($row['func'])
+		{
+			$total_calls++;
+			$next = parse_line($next_line);
+
+			$func = $row;
+			$func['time'] = bcsub($row['time'], $prev['time'], 6);
+			$func['memory'] = $row['memory'] - $prev['memory'];
+			if ($func['memory'] < 0) $func['memory'] = 0;
+			$func['is_nested'] = $next['depth'] > $func['depth'];
+
+			if ($func['depth'] > $max_depth) $max_depth = $func['depth'];
+
+			//show_headers:
+			//$func['prev_depth'] = $prev_func['depth'];
+			//$func['prev_func'] = $prev_func['func'];
+			//$func['prev_include'] = $prev_func['include'];
+			//$func['prev_file'] = $prev_func['file'];
+			//$func['parent_func'] = $parent_func[$func['depth']];
+
+			if ($prev_func['func'] && ($prev_func['depth'] != $row['depth'])) {
+				foreach ($chunked_trace as $tmp_func) {
+					$parsed_trace[] = $tmp_func;
+				}
+				$chunked_trace = array();
+			}
+
+			if ($func['is_nested'] || $func['include']) {
+				$chunked_trace[] = $func;
+			} else if (isset($chunked_trace[$func['func']])) {
+				$chunked_trace[$func['func']]['func_count']++;
+				$chunked_trace[$func['func']]['time'] = bcadd($chunked_trace[$func['func']]['time'], $func['time'], 6);
+				$chunked_trace[$func['func']]['memory'] += $func['memory'];
+			} else {
+				$chunked_trace[$func['func']] = $func;
+			}
+
+			//show_headers:
+			//if ($func['is_nested']) $parent_func[$next['depth']] = $func['func'];
+
+			$prev_func = $func;
+		} else {
+			$next = null;
+		}
+		$prev = $row;
+	}
+
+	foreach ($chunked_trace as $tmp_func) {
+		$parsed_trace[] = $tmp_func;
+	}
+	fclose($xthandle);
+
+	//_debug();
+
+	// summary & real total time
+	foreach ($parsed_trace as $func)
+	{
+		$func_name = $func['func'];
+		if ($func['include']) $func_name = 'include';
+
+		if (isset($summary[$func_name])) {
+			$summary[$func_name]['count'] += $func['func_count'];
+			$summary[$func_name]['time'] = bcadd($summary[$func_name]['time'], $func['time'], 6);
+		} else {
+			$summary[$func_name] = array(
+				'func'=>$func_name, 'count' => $func['func_count'], 'time' => $func['time']
+			);
 		}
 
-		//show_headers:
-		//if ($func['is_nested']) $parent_func[$next['depth']] = $func['func'];
-
-		$prev_func = $func;
-	} else {
-		$next = null;
-	}
-	$prev = $row;
-}
-
-foreach ($chunked_trace as $tmp_func) {
-	$parsed_trace[] = $tmp_func;
-}
-fclose($xthandle);
-
-//_debug();
-
-// summary & real total time
-foreach ($parsed_trace as $func)
-{
-	$func_name = $func['func'];
-	if ($func['include']) $func_name = 'include';
-
-	if (isset($summary[$func_name])) {
-		$summary[$func_name]['count'] += $func['func_count'];
-		$summary[$func_name]['time'] = bcadd($summary[$func_name]['time'], $func['time'], 6);
-	} else {
-		$summary[$func_name] = array(
-			'func'=>$func_name, 'count' => $func['func_count'], 'time' => $func['time']
-		);
+		$real_total_time = bcadd($real_total_time, $func['time'], 6);
+		$real_total_memory += $func['memory'];
 	}
 
-	$real_total_time = bcadd($real_total_time, $func['time'], 6);
-	$real_total_memory += $func['memory'];
+	ob_start();
+
+	if ($show_debug) echo '<div>Time: '.number_format(microtime(1)-$microstart,3).'</div>';
+
+	$parsed_count = count($parsed_trace);
+	// liczymy time_nested
+	$f1 = 0;
+	$f2 = 0;
+	for ($i = 0; $i < $parsed_count; $i++)
+	{
+		$f1++;
+		if (!$parsed_trace[$i]['is_nested']) continue;
+		$parent =& $parsed_trace[$i];
+		$parent['time_nested'] = $parent['time'];
+		$parent['memory_nested'] = $parent['memory'];
+		$parent['nested_calls'] = 0;
+		for ($k = $i+1; $k < $parsed_count; $k++) {
+			$f2++;
+			$parent['time_nested'] = bcadd($parent['time_nested'], $parsed_trace[$k]['time'], 6);
+			$parent['memory_nested'] += $parsed_trace[$k]['memory'];
+			$parent['nested_calls'] += $parsed_trace[$k]['func_count'];
+			$is_last = (($k + 1) == $parsed_count);
+			if ($is_last) { break; }
+			if ($parsed_trace[$k+1]['depth'] <= $parent['depth']) break;
+			if ($parsed_trace[$k+1]['depth'] == $parent['depth']) {
+				$parsed_trace[$k+1]['back_in'] = $parent['parent_func'];
+				break;
+			}
+		}
+	}
 }
 
-ob_start();
-
-if ($show_debug) echo '<div>Time: '.number_format(microtime(1)-$microstart,3).'</div>';
 
 // wykorzystana zmienna $row z petli, nie przenosic tych linijek
 //$total_memory = $row['memory'];
@@ -287,32 +318,7 @@ function sum_chunked_trace($chunked)
 }
 */
 
-$parsed_count = count($parsed_trace);
-// liczymy time_nested
-$f1 = 0;
-$f2 = 0;
-for ($i = 0; $i < $parsed_count; $i++)
-{
-	$f1++;
-	if (!$parsed_trace[$i]['is_nested']) continue;
-	$parent =& $parsed_trace[$i];
-	$parent['time_nested'] = $parent['time'];
-	$parent['memory_nested'] = $parent['memory'];
-	$parent['nested_calls'] = 0;
-	for ($k = $i+1; $k < $parsed_count; $k++) {
-		$f2++;
-		$parent['time_nested'] = bcadd($parent['time_nested'], $parsed_trace[$k]['time'], 6);
-		$parent['memory_nested'] += $parsed_trace[$k]['memory'];
-		$parent['nested_calls'] += $parsed_trace[$k]['func_count'];
-		$is_last = (($k + 1) == $parsed_count);
-		if ($is_last) { break; }
-		if ($parsed_trace[$k+1]['depth'] <= $parent['depth']) break;
-		if ($parsed_trace[$k+1]['depth'] == $parent['depth']) {
-			$parsed_trace[$k+1]['back_in'] = $parent['parent_func'];
-			break;
-		}
-	}
-}
+
 
 if ($show_debug) printf('<div>f1: %d , f2: %d</div>',$f1,$f2);
 
@@ -398,7 +404,8 @@ function common_path($parsed_trace)
 {
 	$common = '';
 	$i = 0;
-	while (true) {
+	if($parsed_trace)
+		while (true) {
 		$prev_char = '';
 		foreach ($parsed_trace as $trow) {
 			if (!isset($trow['file'][$i])) return $common;
@@ -458,12 +465,6 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	</div>
 <?php endif; ?>
 <?php $ftime = ftime($trace_xt);  ?>
-<?php if (!file_exists($trace_xt)/*$ftime > $gtime+1 || $ftime < $gtime-1*/): ?>
-	<div style="background: rgb(255,255,200); padding: 0.25em 0.5em; border: #ccc 1px solid;">
-		WARNING: invalid time of xdebug trace file (differs from the time parameter passed in url).
-		This data is probably from a different request than the debug console indicated, it was generated on: <?php echo fdate($trace_xt);?>
-	</div>
-<?php endif; ?>
 
 <div id="help" style="display:none;">
 # - call no
@@ -474,6 +475,7 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 <h1>xdebug-trace</h1>
 
 <p>
+	<?php if ($xthandle): ?>
 	Func calls: <b><?php echo $total_calls;?></b>
 	-
 	Time: <b><?php echo number_format($real_total_time,3);?></b>
@@ -484,6 +486,7 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	-
 	<a href="javascript:void(0)" onclick="alert($('help').innerHTML.trim());">Help</a>
 	-
+	<?php endif; ?>
 	<a href="javascript:open_db(0);">DB</a>
 	<?php $log = DEBUG_TEMP.'/'.date('Y-m-d',$_GET['time']/100000000).'.log';
 	if(file_exists($log)){ ?>
@@ -496,6 +499,7 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	<a target="_blank" href="../index.php?timeoutlog=<?php echo $_GET['time'];?>">OutLog</a>
 	<?php }?>
 </p>
+<?php if ($xthandle): ?>
 <p>
 	<a href="javascript:collapse_all()" id="collapse-all">Collapse all</a>
 	-
@@ -506,7 +510,7 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 		<a href="javascript:expand_depth(<?php echo $i;?>)" id="expand-depth-<?php echo $i;?>">[<?php echo $i;?>]</a>
 	<?php endfor; ?>
 </p>
-
+<?php endif; ?>
 <script>
 function $(id) { return document.getElementById(id); }
 String.prototype.trim = function() { return this.replace(/^\s*|\s*$/g, ""); };
@@ -675,7 +679,7 @@ function scroll_current_pos()
 	return 0;
 }
 </script>
-
+<?php if ($show_debug): ?>
 <table cellspacing="1" id="mtable">
 <tr>
 	<th>#</th>
@@ -753,7 +757,7 @@ function scroll_current_pos()
 <?php endforeach; ?>
 </table>
 
-<?php if ($show_debug): ?>
+
 	<div>Time: <?php echo number_format(microtime(1)-$microstart,3);?></div>
 <?php endif; ?>
 
@@ -861,6 +865,7 @@ else{
 <div style="clear:both;"></div>
 <?php krumo($data['data']['GLOBALS'],'GLOBALS');?>
 <?php  }?>
+<?php if ($xthandle): ?>
 <a id="summary" name="summary"></a>
 <h2 style="float:left;">Summary</h2>
 <a style="float:left;margin-left: 0.5em;margin-top:0.5em;" href="javascript:void(0)" onclick="history.go(-1);window.scrollTo(0,0);">Up</a>
@@ -883,7 +888,7 @@ else{
 </tr>
 <?php endforeach; ?>
 </table>
-
+<?php endif; ?>
 <?php if ($show_debug): ?>
 	<div>Time: <?php echo number_format(microtime(1)-$microstart,3);?></div>
 <?php endif; ?>

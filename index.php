@@ -17,7 +17,15 @@ if(isset($_GET['timeoutlog']))
 	}
 	exit;
 }
-if(is_file(DEBUG_TEMP.'/xdebug-trace.html')){
-echo file_get_contents(DEBUG_TEMP.'/xdebug-trace.html');
-unlink(DEBUG_TEMP.'/xdebug-trace.html');
+if($_SERVER['QUERY_STRING']=='hist')
+{
+	if(is_file(DEBUG_HIST_FILE)){
+	echo file_get_contents(DEBUG_HIST_FILE);
+	exit;
+	}
+}
+
+if(is_file(DEBUG_LIST_FILE)){
+echo file_get_contents(DEBUG_LIST_FILE);
+unlink(DEBUG_LIST_FILE);
 }

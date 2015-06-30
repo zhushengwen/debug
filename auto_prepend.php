@@ -12,6 +12,7 @@ define('DEBUG_DIR', fb_debug_dir());
 define('DEBUG_TEMP', getenv('TEMP'));
 define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0);
 define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
+define('DEBUG_HIST_FILE',DEBUG_TEMP.'/xdebug-history.html');
 define('DEBUG_FORCE_FAIL',file_exists(DEBUG_LIST_FILE) && time()-filectime(DEBUG_LIST_FILE)>1200);
 
 define('FB_DEBUG_FORCE',!DEBUG_FORCE_FAIL && 1 );
@@ -40,7 +41,7 @@ define('DEBUG_FDB_FILE', DEBUG_FDB_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
 define('dg','fb(get_defined_vars());');
 define('DEBUG_REPLAY',isset($_COOKIE['xdebug-replay']));
-
+define('FB_DEBUG_INDEX',debug_index());
 
 if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
 if(DEBUG_REPLAY)setcookie("xdebug-replay",null,null,'/');
@@ -61,9 +62,6 @@ function fb_debug_dir()
 }
 
 function fa($var){echo "<script>console.log(".json_encode($var).")</script>";}
-
-
-
 
 
 function fc($var){
@@ -123,24 +121,24 @@ function frecord()
   $fb_data = array('method'=>(DEBUG_AJAX?'ajax_':'').$_SERVER['REQUEST_METHOD'],
     'uri'=>XDEBUG_HTTP_HOST.$_SERVER['REQUEST_URI'],
     'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
-  
+  define('FB_HIST_LOG',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" title="'.$_SERVER['REMOTE_ADDR'].'" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'<font color="black">('.$_SERVER["HTTP_HOST"].')</font>'.'</a><br/>');
+  if(!FB_DEBUG_INDEX)file_put_contents(DEBUG_HIST_FILE,FB_HIST_LOG,FILE_APPEND); 
   if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && !debug_index())
   {
-   file_put_contents(DEBUG_LIST_FILE,date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'<font color="black">('.$_SERVER["HTTP_HOST"].')</font>'.'</a><br/>',FILE_APPEND); 
+   file_put_contents(DEBUG_LIST_FILE,FB_HIST_LOG,FILE_APPEND); 
    if(AUTO_FB_COOKIE)fc($fb_data);
-   $fb_data['url']=XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME;
-    foreach($GLOBALS as $k => $v)
+  }
+  $fb_data['url']=XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME;
+  foreach($GLOBALS as $k => $v)
+  {
+    if(!in_array($k, array('GLOBALS','_db','_COOKIE')))
     {
-        if(!in_array($k, array('GLOBALS','_db','_COOKIE')))
-        {
-            $re['$'.$k]=$v;
-        }
+        $re['$'.$k]=$v;
     }
-    $fb_data['GLOBALS'] = $re;
-  }   
-  global $_db;
-  $_db['record']['data'] = $fb_data;
-
+  }
+  $fb_data['GLOBALS'] = $re;
+  $_SERVER['FB_GLO_DATA']=$fb_data;
+ 
   $_SERVER['FB_COOKIE_DC'] = count($_COOKIE) - 20;
   array_walk($_COOKIE,function($val,$key){
   if(preg_match( "/^\d{4}_\d{2}:\d{2}:\d{2}$/", $key, $matches))
@@ -196,13 +194,15 @@ function fb_query($sql,$con = null){
 
 function debug_dev_dir()
 {
-  if(debug_index())return false;
+  if(FB_DEBUG_INDEX)return false;
   return strpos($_SERVER['REQUEST_URI'], '/debug/')!==false;
 }
 
 function debug_index()
 {
-  return in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'));
+  if(!defined('FB_DEBUG_MIAN'))define('FB_DEBUG_MIAN',in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php')));
+  return  FB_DEBUG_MIAN || 
+         in_array($_SERVER['SCRIPT_NAME'],array('/debug/index.php','/debug/dev/xdebug-trace.php','/debug/dev/db-debug.php'));
 }
 
 
@@ -213,8 +213,8 @@ function data_cleanup()
   if ($called) return;
   else $called = true;
   global $_db;
-
   if (DEBUG_FDB && DEBUG_FDB_FILE && !debug_dev_dir() && isset($_db['record'])) {
+    $_db['record']['data'] = $_SERVER['FB_GLO_DATA'];
     file_put_contents(DEBUG_FDB_FILE, serialize($_db['record']));
   }
   $content = ob_get_contents();

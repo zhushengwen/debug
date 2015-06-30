@@ -4,13 +4,12 @@
 	Author: Cezary Tomczak [www.gosu.pl]
 */
 global $_db;
-if(!$_db)$_db = array();
-$_db = array_merge($_db, array(
+$_db = array(
 	'debug_file' => '',
 	'debug_queries' => array(),
 	'debug_count' => null,
 	'debug_time' => null,
-));
+);
 if (!defined('DB_DETECT_MISSING_WHERE')) define('DB_DETECT_MISSING_WHERE',0);
 if (!defined('DB_DETECT_INJECTION')) define('DB_DETECT_INJECTION',0);
 if (!defined('DEBUG_FDB')) define('DEBUG_FDB',0);
