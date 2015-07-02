@@ -194,7 +194,7 @@ function fb_query($sql,$con = null){
 
 function debug_dev_dir()
 {
-  if(FB_DEBUG_INDEX)return false;
+  if(!FB_DEBUG_INDEX)return false;
   return strpos($_SERVER['REQUEST_URI'], '/debug/')!==false;
 }
 
