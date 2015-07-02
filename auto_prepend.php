@@ -86,18 +86,18 @@ function stack()
 
 
 function myErrorHandler123($errno, $errstr, $file, $line){
-if(!(error_reporting() &$errno)){return;}
-$url="[$errno]:$errstr in $file on line $line\r\n";
-file_put_contents(DEBUG_TEMP.'/error.log', $url,FILE_APPEND);
+$html="$errstr::$file:<a href='notepad2://".$file."/?$line'>$line</a><br/>";
+file_put_contents(DEBUG_TEMP.'/xdebug-error.'.XDEBUG_TIME.'.html', $html,FILE_APPEND);
 return true;
 }
+
 function fd($var,$dlog = false)
 {
  if($dlog)file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME.'.log',$var);
  else file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',var_export($var,true)."\r\n",FILE_APPEND);
 }
 function fe($a){var_dump($a);exit;}
-#set_error_handler('myErrorHandler123',E_ALL);
+set_error_handler('myErrorHandler123');
 
  function ff()
  {

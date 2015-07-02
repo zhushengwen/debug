@@ -498,6 +498,11 @@ if ('/' == substr($common_path,-1) && strlen($common_path) > 1) {
 	-
 	<a target="_blank" href="../index.php?timeoutlog=<?php echo $_GET['time'];?>">OutLog</a>
 	<?php }?>
+	<?php $err = DEBUG_TEMP.'/xdebug-error.'.$_GET['time'].'.html';
+	if(file_exists($err)){ ?>
+	-
+	<a target="_blank" href="../index.php?timeouterr=<?php echo $_GET['time'];?>">Error</a>
+	<?php }?>
 </p>
 <?php if ($xthandle): ?>
 <p>
@@ -781,7 +786,6 @@ if (file_exists($data_file)) {
 	$re_method = $is_ajax?substr($method,5):$method;
 	$get_data =  $data['data']['GLOBALS']['$_GET'];
 	$post_data =  $data['data']['GLOBALS']['$_POST'];
-	$cookie_data =  $data['data']['GLOBALS']['$_COOKIE'];
 	$req_data = http_build_query($is_post?$post_data:$get_data);
  ?>
 <a id="DataSumary" name="DataSumary"></a>

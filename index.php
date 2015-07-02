@@ -17,6 +17,14 @@ if(isset($_GET['timeoutlog']))
 	}
 	exit;
 }
+if(isset($_GET['timeouterr']))
+{
+	$err = DEBUG_TEMP.'/xdebug-error.'.$_GET['timeouterr'].'.html';
+	if(file_exists($err)){ 
+		echo file_get_contents($err);
+	}
+	exit;
+}
 if($_SERVER['QUERY_STRING']=='hist')
 {
 	if(is_file(DEBUG_HIST_FILE)){
