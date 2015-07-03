@@ -85,11 +85,30 @@ function stack()
 }
 
 
-function myErrorHandler123($errno, $errstr, $file, $line){
+function fb_error_handler($errno, $errstr, $file, $line){
 $html="$errstr::$file:<a href='notepad2://".$file."/?$line'>$line</a><br/>";
 file_put_contents(DEBUG_TEMP.'/xdebug-error.'.XDEBUG_TIME.'.html', $html,FILE_APPEND);
+if(isset($_SERVER['set_error_function'])&&isset($_SERVER['set_error_no']))
+{
+  $fun = $_SERVER['set_error_function'];
+  $types = $_SERVER['set_error_no'];
+  if($types&$errno)
+  {
+    $param_arr = array($errno, $errstr, $file, $line);
+    if(is_array($fun))call_user_func_array($fun, $param_arr);
+    elseif(is_string($fun) && ($pos=strpos($fun, '::'))!==false)
+    {
+      $fun_arr=array(substr($fun, 0,$pos),substr($fun, $pos+2));
+      call_user_func_array($fun_arr, $param_arr);
+    }elseif(is_string($fun))
+    {
+      call_user_func_array($fun, $param_arr);
+    }
+  }
+}
 return true;
 }
+set_error_handler('fb_error_handler');
 
 function fd($var,$dlog = false)
 {
@@ -97,7 +116,7 @@ function fd($var,$dlog = false)
  else file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',var_export($var,true)."\r\n",FILE_APPEND);
 }
 function fe($a){var_dump($a);exit;}
-set_error_handler('myErrorHandler123');
+
 
  function ff()
  {
@@ -147,6 +166,11 @@ function frecord()
   });
   if(DEBUG_FB)
   {
+      if(AUTOD_FB){
+      $_SERVER['set_error_handler']='set_error_handler_back';
+      runkit_function_copy('set_error_handler',$_SERVER['set_error_handler']);
+      runkit_function_redefine('set_error_handler','$fun,$types=E_ALL','$_SERVER["set_error_function"]=$fun;$_SERVER["set_error_no"]=$types;return $_SERVER["set_error_handler"]("fb_error_handler");');
+      }
       $path = dirname(__FILE__).'/lib/debug.php';
       if(file_exists($path))require_once $path; 
       if(DEBUG_FDB)
