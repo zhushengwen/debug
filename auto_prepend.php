@@ -86,7 +86,8 @@ function stack()
 
 
 function fb_error_handler($errno, $errstr, $file, $line){
-$html="$errstr::$file:<a href='notepad2://".$file."/?$line'>$line</a><br/>";
+static $ec=0;$ec++;
+$html="<strong>$ec</strong>:$errstr::$file:<a href='notepad2://".$file."/?$line'>$line</a><br/>";
 file_put_contents(DEBUG_TEMP.'/xdebug-error.'.XDEBUG_TIME.'.html', $html,FILE_APPEND);
 if(isset($_SERVER['set_error_function'])&&isset($_SERVER['set_error_no']))
 {
@@ -198,18 +199,16 @@ function frecord()
 function fb_sql($sql,$time=0,$data='')
 {
   if (DEBUG_FDB) {
-    global $_db;
-    db_empty($_db['debug_count']+1,$sql);
+    db_empty($_SERVER['FB_DATA']['debug_count']+1,$sql);
     db_add_sql($sql,$time,$data);
    }
 }
 
 
 function fb_query($sql,$con = null){
-  global $_db;
 
   if (DEBUG_FDB) {
-    db_empty($_db['debug_count']+1,$sql);
+    db_empty($_SERVER['FB_DATA']['debug_count']+1,$sql);
   }
   if(function_exists('db_query'))return db_query($sql,$con);
   else if($con)return mysql_query($sql,$con);
@@ -236,10 +235,9 @@ function data_cleanup()
   static $called = false;
   if ($called) return;
   else $called = true;
-  global $_db;
   if (DEBUG_FDB_FILE && !debug_dev_dir()) {
-    $_db['record']['data'] = $_SERVER['FB_GLO_DATA'];
-    file_put_contents(DEBUG_FDB_FILE, serialize($_db['record']));
+    $_SERVER['FB_DATA']['record']['data'] = $_SERVER['FB_GLO_DATA'];
+    file_put_contents(DEBUG_FDB_FILE, serialize($_SERVER['FB_DATA']['record']));
   }
   $content = ob_get_contents();
   if(FB_RECOND_CONTENT)fd($content,true);

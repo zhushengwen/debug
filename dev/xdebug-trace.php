@@ -13,13 +13,28 @@ $memorystart = memory_get_usage();
 
 $show_headers = false;
 $show_debug = false;
+$included_files = array();
+function pf($file)
+{
+	if(strpos($file, 'auto_prepend.php')!==false||strpos($file, 'lib/db-mysql.php')!==false)return;
+	global $included_files;
+	foreach ($included_files as $value) {
+		if(strtolower($file)==$value)
+		{
+			return;
+		}
+	}
+	$included_files[]=$file;
+}
 function pt($file,$line=1,$title='')
 {
+  pf($file);
   return sprintf('%s:<a style="display:inline;text-decoration: none;" title="%s" href="javascript:location.href=\'notepad2://\'+((\'%s\'.indexOf(\':\')==-1)?\'http://\'+location.host:\'\')+\'%s/?%s\'"><b>%s</b></a>',
   $file,$title,$file,$file,$line,$line);
 }
 function ps($file)
 {
+  pf($file);
   return sprintf('<a style="display:inline;text-decoration: none;" href="javascript:location.href=\'notepad2://\'+((\'%s\'.indexOf(\':\')==-1)?\'http://\'+location.host:\'\')+\'%s/?1\'"><b>%s</b></a>',
   $file,$file,$file);
 }
@@ -896,6 +911,7 @@ else{
 <?php if ($show_debug): ?>
 	<div>Time: <?php echo number_format(microtime(1)-$microstart,3);?></div>
 <?php endif; ?>
+<?php echo debug_included_files($included_files);?>
 </body>
 <script>
 function debug_cookie_set(name, value)
@@ -982,6 +998,17 @@ function debug_list()
 	}
 }
 debug_list();
+function toggle_pre(id, pre_id)
+{
+	$('h2_'+id).blur();
+	if ($(id).style.height == '0px') {
+		$(id).style.height = 'auto';
+		$(id).style.overflow = 'visible';
+	} else {
+		$(id).style.height = 0 + 'px';
+		$(id).style.overflow = 'auto';
+	}
+}
 </script>
 </html>
 <?php ob_end_flush(); ?>

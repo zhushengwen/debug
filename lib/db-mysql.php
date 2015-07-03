@@ -1,14 +1,14 @@
 <?php
 /*
 	Database abstraction library for mysql.
-	Author: Cezary Tomczak [www.gosu.pl]
+	Author: zhushengwen [zhushengwenzsw@126.com]
 */
-global $_db;
-$_db = array(
+
+$_SERVER['FB_DATA'] = array(
 	'debug_file' => '',
 	'debug_queries' => array(),
-	'debug_count' => null,
-	'debug_time' => null,
+	'debug_count' => 0,
+	'debug_time' => 0,
 );
 if (!defined('DB_DETECT_MISSING_WHERE')) define('DB_DETECT_MISSING_WHERE',0);
 if (!defined('DB_DETECT_INJECTION')) define('DB_DETECT_INJECTION',0);
@@ -37,7 +37,7 @@ if (DB_DETECT_INJECTION) {
 // -------- podstawowe funkcje: db_query() db_one() db_row() db_list() db_assoc()
 function db_empty($id,$sql){}
 function db_add_sql($sql,$time,$data){
-	global $_db;
+	
 	if (DEBUG_FDB) {
 		//$microstart = microtime(true);if(function_exists('fb_sql'))fb_sql($sql,microtime(true)-$microstart,$result);
 			$rows = array();
@@ -55,20 +55,20 @@ function db_add_sql($sql,$time,$data){
 				$data = array('fids'=>$fids,'rows'=>$rows);
 			}
 
-		$_db['record']['debug_queries'][] = array('query'=>$sql, 'time'=>$time ,'seq'=>$_db['debug_count']+1,'data' => $data?json_encode($data):'');
-		$_db['debug_count']++; $_db['debug_time'] += $time;
+		$_SERVER['FB_DATA']['record']['debug_queries'][] = array('query'=>$sql, 'time'=>$time ,'seq'=>$_SERVER['FB_DATA']['debug_count']+1,'data' => $data?json_encode($data):'');
+		$_SERVER['FB_DATA']['debug_count']++; $_SERVER['FB_DATA']['debug_time'] += $time;
 	}
 }
 function db_query($query,$con)
 {
-	global $_db;
+	
 
 	if (DEBUG_FDB) $microstart = microtime(true);
     $result = $con?$_SERVER['mysql_query']($query, $con):$_SERVER['mysql_query']($query);
 	if (DEBUG_FDB) {
 		$time = microtime(true)-$microstart;
-		$_db['record']['debug_queries'][] = array('query'=>$query, 'time'=>$time ,'seq'=>$_db['debug_count']+1,'data' => json_encode(is_resource($result)?db_result($result):''));
-		$_db['debug_count']++; $_db['debug_time'] += $time;
+		$_SERVER['FB_DATA']['record']['debug_queries'][] = array('query'=>$query, 'time'=>$time ,'seq'=>$_SERVER['FB_DATA']['debug_count']+1,'data' => json_encode(is_resource($result)?db_result($result):''));
+		$_SERVER['FB_DATA']['debug_count']++; $_SERVER['FB_DATA']['debug_time'] += $time;
 	}
 	return $result;
 }

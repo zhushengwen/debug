@@ -1,6 +1,6 @@
 <?php
-// PHP debug tools - http://www.gosu.pl/debug/
-// Author: Cezary Tomczak [cagret at gmail.com]
+
+// Author: zhushengwen [zhushengwenzsw@126.com]
 
 error_reporting(-1);
 ini_set('display_errors', true);
@@ -272,10 +272,12 @@ function debug_display($main_var, $trace, $system)
 	echo $return;
 	exit;
 }
-function debug_included_files()
+function debug_included_files($files=array())
 {
-	$files = get_included_files();
-	$files = array_reverse($files, true);
+	if(!$files){
+		$files = get_included_files();
+		$files = array_reverse($files, true);
+	}
 	$included = array();
 	foreach ($files as $k => $file) {
 		$nk = $k+1;
@@ -1306,18 +1308,18 @@ function debug_console($display=false)
     if(defined('DEBUG_CONSOLE') && !DEBUG_CONSOLE) return;
     if(DEBUG_AJAX)return;
     
-	global $_db, $Db;
+	global  $Db;
 
 	$db_time = null;
-	if (isset($_db['debug_time'])) {
-		$db_time = $_db['debug_time'];
+	if (isset($_SERVER['FB_DATA']['debug_time'])) {
+		$db_time = $_SERVER['FB_DATA']['debug_time'];
 	} else if (isset($Db['DebugTime'])) {
 		$db_time = $Db['DebugTime'];
 	}
 
 	$db_cqueries = null;
-	if (isset($_db['record']['debug_queries'])) {
-		$db_cqueries = count($_db['record']['debug_queries']);
+	if (isset($_SERVER['FB_DATA']['record']['debug_queries'])) {
+		$db_cqueries = count($_SERVER['FB_DATA']['record']['debug_queries']);
 	} else if (isset($Db['DebugQueries'])) {
 		$db_cqueries = count($Db['DebugQueries']);
 	}
@@ -1347,7 +1349,7 @@ function debug_console($display=false)
 	$hide = DEBUG_COOKIE == -1?'show':'hide';
 	$ret = "<div class='debug_console' id='DebugConsole'>";
 	$ret .= "<div>php: $php_time";
-	if ($_db || $Db) $ret .= " - mysql: $mysql_time ";
+	if ($_SERVER['FB_DATA'] || $Db) $ret .= " - mysql: $mysql_time ";
 	$ret .= " - mem: $memory</div>";
 
 	$ret .= '<div>';

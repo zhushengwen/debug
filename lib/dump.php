@@ -1,6 +1,5 @@
 <?php
-// PHP debug tools - http://www.gosu.pl/debug/
-// Author: Cezary Tomczak [cagret at gmail.com]
+//Author: zhushengwen [zhushengwenzsw@126.com]
 
 function dump()
 {
