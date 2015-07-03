@@ -249,7 +249,13 @@ function data_cleanup()
   if(!DEBUG_AJAX && DEBUG_FB)
   {
       fb_debug_stop();
-      if(trim($content)!=''&&stristr($content,'</')===false)return;
+      $content=trim($content);
+
+      if($content!='')
+      {
+      if($content{0}!=='<'&&substr($content, -1)!=='>')return;
+      if(strpos($content,'<?xml')===0||stristr($content,'</')===false)return;
+      }
       echo debug_console();
   }
 }

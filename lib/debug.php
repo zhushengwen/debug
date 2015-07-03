@@ -1302,7 +1302,7 @@ function debug_console($display=false)
 	if (defined('DEBUG_CONSOLE_HIDE') && DEBUG_CONSOLE_HIDE) {
 		return;
 	}
-	if (debug_dev_dir()) {
+	if (debug_dev_dir()&&!defined('DEBUG_FB_SHOW')) {
 		return;
 	}
     if(defined('DEBUG_CONSOLE') && !DEBUG_CONSOLE) return;

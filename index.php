@@ -32,7 +32,7 @@ if($_SERVER['QUERY_STRING']=='hist')
 	exit;
 	}
 }
-
+define('DEBUG_FB_SHOW',true);
 if(is_file(DEBUG_LIST_FILE)){
 echo file_get_contents(DEBUG_LIST_FILE);
 unlink(DEBUG_LIST_FILE);
