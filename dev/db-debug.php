@@ -272,7 +272,7 @@ ob_start();
 </head>
 <body>
 
-<h1>db-debug <font size="1.5"><?php echo $data['data']['method'].':';?> <a style="color:darkcyan;" href="javascript:open_trace(0);"><?php echo $data['data']['uri'];?></a></font></h1>
+<h1>db-debug <font size="1.5"><?php echo $data['data']['method'].':';?> <a style="color:black;" href="javascript:open_trace(0);"><?php echo $data['data']['uri'];?></a></font></h1>
 
 <script>
 
