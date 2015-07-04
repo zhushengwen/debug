@@ -88,25 +88,27 @@ function stack()
 function fb_error_handler($errno, $errstr, $file, $line){
 static $ec=0;$ec++;
 $html="<strong>$ec</strong>:$errstr::$file:<a href='notepad2://".$file."/?$line'>$line</a><br/>";
-file_put_contents(DEBUG_TEMP.'/xdebug-error.'.XDEBUG_TIME.'.html', $html,FILE_APPEND);
+$call = 0;
 if(isset($_SERVER['set_error_function'])&&isset($_SERVER['set_error_no']))
 {
   $fun = $_SERVER['set_error_function'];
   $types = $_SERVER['set_error_no'];
   if($types&$errno)
   {
-    $param_arr = array($errno, $errstr, $file, $line);
-    if(is_array($fun))call_user_func_array($fun, $param_arr);
+    $param_arr = func_get_args();// array($errno, $errstr, $file, $line);
+    if(is_array($fun))$call=1;
     elseif(is_string($fun) && ($pos=strpos($fun, '::'))!==false)
     {
-      $fun_arr=array(substr($fun, 0,$pos),substr($fun, $pos+2));
-      call_user_func_array($fun_arr, $param_arr);
+      $fun =array(substr($fun, 0,$pos),substr($fun, $pos+2));
+      $call=2;
     }elseif(is_string($fun))
     {
-      call_user_func_array($fun, $param_arr);
+      $call=3;
     }
   }
 }
+file_put_contents(DEBUG_TEMP.'/xdebug-error.'.XDEBUG_TIME.'.html', $html,FILE_APPEND);
+if($call)call_user_func_array($fun, $param_arr);
 return true;
 }
 set_error_handler('fb_error_handler');

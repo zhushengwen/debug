@@ -106,7 +106,7 @@ if($xthandle)
 		}
 		if (!$row) continue;
 		if ($first_row) { $first_row = false; $prev = $row; continue; }
-		if ('xdebug_stop_trace' == $row['func']) break;
+		if ('data_cleanup' == $row['func']) break;
 
 		if ($row['func'])
 		{
@@ -258,7 +258,9 @@ function parse_line($line)
 	}
 
 	$row = $rowtpl;
-
+	static $call_skip = false;
+	if($tabs[5] == 'fb_error_handler'){$call_skip=true;return;}
+    if($call_skip){if($tabs[5] ==  'file_put_contents')$call_skip = false;return;}
 	static $call_id = 0;
 	$call_id++;
 
@@ -713,7 +715,6 @@ function scroll_current_pos()
 <?php $last_depth = null; $last_file = null; $indent = array(); $last_include = ''; $tr_style = ''; $last_tr = ''; $last_tr_depth = 0; $tr_count = 0; $prev_row = null; ?>
 <?php foreach ($parsed_trace as $k => $trace): ?>
 <?php
-   if($trace['func'] == 'data_cleanup')break;
 	$func_class = '';
 	if ($trace['include']) $func_class = 'include internal';
 	else {
@@ -911,7 +912,7 @@ else{
 <?php if ($show_debug): ?>
 	<div>Time: <?php echo number_format(microtime(1)-$microstart,3);?></div>
 <?php endif; ?>
-<?php echo debug_included_files($included_files);?>
+<?php if($included_files) echo debug_included_files($included_files);?>
 </body>
 <script>
 function debug_cookie_set(name, value)
