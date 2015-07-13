@@ -92,7 +92,7 @@ function table_from_query($query)
 		}
 	} else if (preg_match('#UPDATE\s+`?(\w+)`?#i', $query, $match)) {
 		$table = $match[1];
-	} else if (preg_match('#INSERT\s+INTO\s+`?(\w+)`?#', $query, $match)) {
+	} else if (preg_match('#INSERT\s+INTO\s+`?(\w+)`?#i', $query, $match)) {
 		$table = $match[1];
 	} else {
 		$table = false;
