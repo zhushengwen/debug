@@ -875,7 +875,7 @@ r.onreadystatechange = function() {
 if(p){
 	r.open('POST', l, true);
 	if(x){
-		r.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+		r.setRequestHeader("Content-Type","application/text/xml; charset=UTF-8");
 		r.send(x);
 	}else{
 	r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
