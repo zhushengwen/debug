@@ -799,7 +799,8 @@ if (file_exists($data_file)) {
 	$method = $data['data']['method'];
 	$uri = $data['data']['uri'];
 	$xmlr_data = isset($data['data']['GLOBALS']['$HTTP_RAW_POST_DATA'])?$data['data']['GLOBALS']['$HTTP_RAW_POST_DATA']:'';
-	$is_ajax = $xmlr_data || strpos($method, 'ajax')!==false?1:0;
+	$ir_ajax = strpos($method, 'ajax')!==false?1:0;
+	$is_ajax = $xmlr_data || $ir_ajax;
 	if($xmlr_data)$xmlr_data = '"'.str_replace(array("\"","\r","\n"), array("\\\"","\\r","\\n"), $xmlr_data).'"';
 	$is_post = strpos($method, 'POST')!==false?1:0;
 	$re_method = $is_ajax?substr($method,5):$method;
@@ -815,6 +816,7 @@ if (file_exists($data_file)) {
 
 function redo(){
 var l = '<?php echo $uri;?>';
+var rjax = <?php echo $ir_ajax;?>;
 var ajax = <?php echo $is_ajax;?>;
 var method = '<?php echo $re_method;?>';
 var d = '<?php echo $req_data;?>';
@@ -875,6 +877,7 @@ r.onreadystatechange = function() {
 if(p){
 	r.open('POST', l, true);
 	if(x){
+		if(rjax)r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 		r.setRequestHeader("Content-Type","application/text/xml; charset=UTF-8");
 		r.send(x);
 	}else{
