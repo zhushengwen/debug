@@ -7,6 +7,7 @@ ini_set('display_errors', true);
 ini_set('log_errors', 1);
 ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
 ini_set('date.timezone', 'Asia/Shanghai');
+ini_set('xdebug.overload_var_dump', false);
 set_time_limit(0);
 $microstart = microtime(1);
 $memorystart = memory_get_usage();
@@ -19,7 +20,7 @@ function pf($file)
 	if(strpos($file, 'auto_prepend.php')!==false||strpos($file, 'lib/db-mysql.php')!==false)return;
 	global $included_files;
 	foreach ($included_files as $value) {
-		if(strtolower($file)==$value)
+		if(strtolower($file)==strtolower($value))
 		{
 			return;
 		}
