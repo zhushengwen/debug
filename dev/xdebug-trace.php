@@ -798,11 +798,14 @@ if (file_exists($data_file)) {
 	$data = unserialize(file_get_contents($data_file));
 	$method = $data['data']['method'];
 	$uri = $data['data']['uri'];
-	$is_ajax = strpos($method, 'ajax')!==false?1:0;
+	$xmlr_data = isset($data['data']['GLOBALS']['$HTTP_RAW_POST_DATA'])?$data['data']['GLOBALS']['$HTTP_RAW_POST_DATA']:'';
+	$is_ajax = $xmlr_data || strpos($method, 'ajax')!==false?1:0;
+	if($xmlr_data)$xmlr_data = '"'.str_replace(array("\"","\r","\n"), array("\\\"","\\r","\\n"), $xmlr_data).'"';
 	$is_post = strpos($method, 'POST')!==false?1:0;
 	$re_method = $is_ajax?substr($method,5):$method;
 	$get_data =  $data['data']['GLOBALS']['$_GET'];
 	$post_data =  $data['data']['GLOBALS']['$_POST'];
+
 	$req_data = http_build_query($is_post?$post_data:$get_data);
  ?>
 <a id="DataSumary" name="DataSumary"></a>
@@ -862,6 +865,7 @@ if(!ajax){
 	replay_form.submit();return;
 	}
 var p = <?php echo $is_post;?>;
+var x = <?php echo $xmlr_data;?>;
 var r = new(self.XMLHttpRequest||ActiveXObject)("Microsoft.XMLHTTP");
 r.onreadystatechange = function() {
 	if (r.readyState == 4 && r.status == 200){
@@ -870,9 +874,15 @@ r.onreadystatechange = function() {
 }
 if(p){
 	r.open('POST', l, true);
+	if(x){
+		r.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+		r.send(x);
+	}else{
 	r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 	r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
 	r.send(d);
+	}
+
 }
 else{
 	r.open('GET', l + (d&&l.indexOf('?')==-1?'?':'') + (d&&l.indexOf('&')==l.length-1?'':'&') + d, true);
