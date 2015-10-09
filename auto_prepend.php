@@ -53,8 +53,8 @@ function fb_debug_dir()
 	$root = str_replace('\\', '/', $root);
 	$dir = str_replace('\\', '/', $dir);
 	if ('/' == substr($root, -1)) { $root = substr($root, 0, -1); }
-	$root = preg_replace('#^([a-z])(:[\s\S]+)$#ie', "strtolower('\\1').'\\2'", $root);
-	$dir = preg_replace('#^([a-z])(:[\s\S]+)$#ie', "strtolower('\\1').'\\2'", $dir);
+	$root = @preg_replace('#^([a-z])(:[\s\S]+)$#ie', "strtolower('\\1').'\\2'", $root);
+	$dir = @preg_replace('#^([a-z])(:[\s\S]+)$#ie', "strtolower('\\1').'\\2'", $dir);
 	if ($root == substr($dir, 0, strlen($root))) {
 		$ret = substr($dir, strlen($root));
 	}
