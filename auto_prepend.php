@@ -220,7 +220,7 @@ function fb_query($sql,$con = null){
 
 function debug_dev_dir()
 {
-  return FB_DEBUG_INDEX || strpos($_SERVER['REQUEST_URI'], '/debug/')!==false;
+  return FB_DEBUG_INDEX || (isset($_SERVER['REQUEST_URI'])&&strpos($_SERVER['REQUEST_URI'], '/debug/'))!==false;
 }
 
 function debug_index()
