@@ -1479,6 +1479,7 @@ function fb_debug_start()
 	if (debug_dev_dir()) {
 		return;
 	}
+
 	static $called;
 	if ($called) return;
 	else $called = true;

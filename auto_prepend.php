@@ -7,7 +7,7 @@ define('IS_GBK',0);
 defined('DEBUG_CONSOLE_HIDE');
 //define('DEBUG_CONSOLE_HIDE',1);
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
-define('LOCAL',isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR'])==$_SERVER['REMOTE_ADDR']);
+define('LOCAL',($_SERVER['REMOTE_ADDR']=="10.0.2.2") || isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR'])==$_SERVER['REMOTE_ADDR']);
 define('DEBUG_DIR', fb_debug_dir());
 define('DEBUG_TEMP', getenv('TEMP'));
 define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0);
@@ -219,15 +219,15 @@ function fb_query($sql,$con = null){
 
 function debug_dev_dir()
 {
-  if(!FB_DEBUG_INDEX)return false;
-  return strpos($_SERVER['REQUEST_URI'], '/debug/')!==false;
+  return FB_DEBUG_INDEX || strpos($_SERVER['REQUEST_URI'], '/debug/')!==false;
 }
 
 function debug_index()
 {
   if(!defined('FB_DEBUG_MIAN'))define('FB_DEBUG_MIAN',in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php')));
   return  FB_DEBUG_MIAN || 
-         in_array($_SERVER['SCRIPT_NAME'],array('/debug/index.php','/debug/dev/xdebug-trace.php','/debug/dev/db-debug.php'));
+         in_array($_SERVER['SCRIPT_NAME'],array('/debug/index.php','/debug/dev/xdebug-trace.php','/debug/dev/db-debug.php',
+          '/dev/xdebug-trace.php','/dev/db-debug.php'));
 }
 
 
