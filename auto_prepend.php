@@ -10,13 +10,14 @@ define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('LOCAL',(isset($_SERVER["REMOTE_ADDR"]) && $_SERVER['REMOTE_ADDR']=="10.0.2.2") ||
  isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR'])==$_SERVER['REMOTE_ADDR']);
 define('DEBUG_DIR', fb_debug_dir());
-define('DEBUG_TEMP', getenv('TEMP'));
+define('DEBUG_TEMP', (DIRECTORY_SEPARATOR === '\\')?'C:\\Windows\Temp':'/tmp');
 define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0);
 define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
 define('DEBUG_HIST_FILE',DEBUG_TEMP.'/xdebug-history.html');
 define('DEBUG_FORCE_FAIL',file_exists(DEBUG_LIST_FILE) && time()-filectime(DEBUG_LIST_FILE)>1200);
 
-define('FB_DEBUG_FORCE',!DEBUG_FORCE_FAIL || 1 );
+define('FB_DEBUG_FORCE',!DEBUG_FORCE_FAIL && 0 );
+
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
 define('DEBUG_FB_DIR', dirname(__FILE__));
@@ -121,7 +122,6 @@ function fd($var,$dlog = false)
 }
 function fe($a){var_dump($a);exit;}
 
-
  function ff()
  {
     echo fb_debug();
@@ -141,10 +141,10 @@ function frecord()
     
        eval('function fb($var){fa($var);}');
    }
-  $fb_data = array('method'=>(DEBUG_AJAX?'ajax_':'').$_SERVER['REQUEST_METHOD'],
-    'uri'=>XDEBUG_HTTP_HOST.$_SERVER['REQUEST_URI'],
+  $fb_data = array('method'=>(DEBUG_AJAX?'ajax_':'').SGS('REQUEST_METHOD'),
+    'uri'=>XDEBUG_HTTP_HOST.SGS('REQUEST_URI'),
     'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
-  define('FB_HIST_LOG',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" title="'.$_SERVER['REMOTE_ADDR'].'" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.$_SERVER['REQUEST_METHOD'].':'.$_SERVER['REQUEST_URI'].'</a>('.$_SERVER["HTTP_HOST"].'-<a target="_blank" href="https://www.baidu.com/s?wd='.$_SERVER['REMOTE_ADDR'].'" ><font color="darkblue">'.$_SERVER['REMOTE_ADDR'].'</font></a>)<br/>');
+  define('FB_HIST_LOG',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" title="'.SGS('REMOTE_ADDR').'" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.SGS('REQUEST_METHOD').':'.SGS('REQUEST_URI').'</a>('.SGS("HTTP_HOST").'-<a target="_blank" href="https://www.baidu.com/s?wd='.SGS('REMOTE_ADDR').'" ><font color="darkblue">'.SGS('REMOTE_ADDR').'</font></a>)<br/>');
   if(!FB_DEBUG_INDEX)file_put_contents(DEBUG_HIST_FILE,FB_HIST_LOG,FILE_APPEND); 
   if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && !debug_index())
   {
@@ -205,7 +205,7 @@ function frecord()
   return $fb_data;
 }
 
-
+function SGS($key){return isset($_SERVER[$key])?$_SERVER[$key]:'';}
 
 function fb_sql($sql,$time=0,$data='')
 {
