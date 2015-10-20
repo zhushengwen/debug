@@ -59,28 +59,30 @@ function db_add_sql($sql,$time,$data){
 		$_SERVER['FB_DATA']['debug_count']++; $_SERVER['FB_DATA']['debug_time'] += $time;
 	}
 }
-function db_query($query,$con)
+function db_query($query,$con,$mysqli=false)
 {
 	
 
 	if (DEBUG_FDB) $microstart = microtime(true);
-    $result = $con?$_SERVER['mysql_query']($query, $con):$_SERVER['mysql_query']($query);
+	if($mysqli)	$result = $_SERVER['mysqli_query']($con,$query);
+    else $result = $con?$_SERVER['mysql_query']($query,$con):$_SERVER['mysql_query']($query);
+    
 	if (DEBUG_FDB) {
 		$time = microtime(true)-$microstart;
-		$_SERVER['FB_DATA']['record']['debug_queries'][] = array('query'=>$query, 'time'=>$time ,'seq'=>$_SERVER['FB_DATA']['debug_count']+1,'data' => json_encode(is_resource($result)?db_result($result):''));
+		$_SERVER['FB_DATA']['record']['debug_queries'][] = array('query'=>$query, 'time'=>$time ,'seq'=>$_SERVER['FB_DATA']['debug_count']+1,'data' => json_encode((is_resource($result)||is_object($result))?db_result($result,$mysqli):''));
 		$_SERVER['FB_DATA']['debug_count']++; $_SERVER['FB_DATA']['debug_time'] += $time;
 	}
 	return $result;
 }
 
-function db_result($result)
+function db_result($result,$mysqli=false)
 {
 	$fids = array();
 	$rows = array();
-	while ($property = mysql_fetch_field($result)) $fids[] = $property->name;
-	while ($row = mysql_fetch_row($result)) $rows[] = $row;
-	if($fids)@mysql_field_seek($result, 0);
-	if($rows)@mysql_data_seek($result, 0);
+	while ($property = $mysqli?mysqli_fetch_field($result):mysql_fetch_field($result)) $fids[] = $property->name;
+	while ($row = $mysqli?mysqli_fetch_row($result):mysql_fetch_row($result)) $rows[] = $row;
+	if($fids)@$mysqli?mysqli_field_seek($result, 0):mysql_field_seek($result, 0);
+	if($rows)@$mysqli?mysqli_data_seek($result, 0):mysql_data_seek($result, 0);
 	return array('fids'=>$fids,'rows'=>$rows);
 }
 

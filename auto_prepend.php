@@ -16,7 +16,7 @@ define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
 define('DEBUG_HIST_FILE',DEBUG_TEMP.'/xdebug-history.html');
 define('DEBUG_FORCE_FAIL',file_exists(DEBUG_LIST_FILE) && time()-filectime(DEBUG_LIST_FILE)>1200);
 
-define('FB_DEBUG_FORCE',!DEBUG_FORCE_FAIL && 1 );
+define('FB_DEBUG_FORCE',!DEBUG_FORCE_FAIL || 1 );
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
 define('DEBUG_FB_DIR', dirname(__FILE__));
@@ -188,7 +188,15 @@ function frecord()
               if(!function_exists($_SERVER['mysql_query']))
               runkit_function_copy('mysql_query',$_SERVER['mysql_query']);
               runkit_function_redefine('mysql_query','$sql,$con=null','return fb_query($sql,$con);');
-              }else $_SERVER['mysql_query']='mysql_query';
+              
+              $_SERVER['mysqli_query']='mysqli_query_back';
+              if(!function_exists($_SERVER['mysqli_query']))
+              runkit_function_copy('mysqli_query',$_SERVER['mysqli_query']);
+              runkit_function_redefine('mysqli_query','$con,$sql','return fb_query($sql,$con,true);');
+              }else {
+                $_SERVER['mysql_query']='mysql_query';
+                $_SERVER['mysqli_query']='mysqli_query';
+              }
           }
     
       }
@@ -208,12 +216,13 @@ function fb_sql($sql,$time=0,$data='')
 }
 
 
-function fb_query($sql,$con = null){
+function fb_query($sql,$con = null,$mysqli = false){
 
   if (DEBUG_FDB) {
     db_empty($_SERVER['FB_DATA']['debug_count']+1,$sql);
   }
-  if(function_exists('db_query'))return db_query($sql,$con);
+  if(function_exists('db_query'))return db_query($sql,$con,$mysqli);
+  else if($mysqli)return mysqli_query($con,$sql);
   else if($con)return mysql_query($sql,$con);
   else return mysql_query($sql);
 }
