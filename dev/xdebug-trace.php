@@ -42,7 +42,7 @@ function ps($file)
 function fb_link_db($func,$params,$cid){
 	if($func=='db_empty'){
 		$temp = $params;
-		if(preg_match('#\$id = (\d+)\r\n\$sql = &apos;(.+)&apos;#', $params, $match)){
+		if(preg_match('#(?:\$id = )?(\d+)\r\n(?:\$sql = )?&apos;(.+)&apos;#', $params, $match)){
 		$id = $match[1];
 		$sql = stripslashes($match[2]);
 		return "<a id=\"sql_$id\" cid=\"$cid\" title=\"$sql\" href=\"javascript:open_db($id);\">$func</a>($id)";
@@ -800,7 +800,7 @@ if (file_exists($data_file)) {
 	$uri = $data['data']['uri'];
 	$xmlr_data = isset($data['data']['GLOBALS']['$HTTP_RAW_POST_DATA'])?$data['data']['GLOBALS']['$HTTP_RAW_POST_DATA']:'';
 	$ir_ajax = strpos($method, 'ajax')!==false?1:0;
-	$is_ajax = $xmlr_data || $ir_ajax;
+	$is_ajax = ($xmlr_data || $ir_ajax)?1:0;
 	if($xmlr_data)$xmlr_data = '"'.str_replace(array("\"","\r","\n"), array("\\\"","\\r","\\n"), $xmlr_data).'"';
 	$is_post = strpos($method, 'POST')!==false?1:0;
 	$re_method = $is_ajax?substr($method,5):$method;
@@ -867,7 +867,7 @@ if(!ajax){
 	replay_form.submit();return;
 	}
 var p = <?php echo $is_post;?>;
-var x = <?php echo $xmlr_data;?>;
+var x = '<?php echo $xmlr_data;?>';
 var r = new(self.XMLHttpRequest||ActiveXObject)("Microsoft.XMLHTTP");
 r.onreadystatechange = function() {
 	if (r.readyState == 4 && r.status == 200){
