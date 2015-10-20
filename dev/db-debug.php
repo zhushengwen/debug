@@ -324,7 +324,7 @@ function open_trace(id){
 			this.fb_trace.open_trace(id);
 		}else{
 			var regr = /^.*time=(\d{18}).*$/.exec(location.href);
-			if(regr){debug_popup
+			if(regr){
 				this.fb_trace = debug_popup("<?php echo XDEBUG_TRACE_SCRIPT.'?time=';?>"+regr[1],800,500);
 				this.fb_trace.onload = function (){
 				this.open_trace(id);
