@@ -3,7 +3,7 @@ header("Content-type: text/html; charset=utf-8");
 if(isset($_GET['timelog']))
 {
 	$log = DEBUG_TEMP.'/'.date('Y-m-d',$_GET['timelog']/100000000).'.log';
-	if(file_exists($log)){ 
+	if(file_exists($log)){
 	   echo file_get_contents($log);
 	   unlink($log);
 	}

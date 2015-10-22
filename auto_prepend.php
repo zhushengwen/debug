@@ -6,6 +6,7 @@ define('DEBUG_FB',1);
 define('IS_GBK',0);
 defined('DEBUG_CONSOLE_HIDE');
 //define('DEBUG_CONSOLE_HIDE',1);
+define('DEBUG_CLI',PHP_SAPI == 'cli');
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('LOCAL',(isset($_SERVER["REMOTE_ADDR"]) && $_SERVER['REMOTE_ADDR']=="10.0.2.2") ||
  isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR'])==$_SERVER['REMOTE_ADDR']);
@@ -16,7 +17,7 @@ define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
 define('DEBUG_HIST_FILE',DEBUG_TEMP.'/xdebug-history.html');
 define('DEBUG_FORCE_FAIL',file_exists(DEBUG_LIST_FILE) && time()-filectime(DEBUG_LIST_FILE)>1200);
 
-define('FB_DEBUG_FORCE',!DEBUG_FORCE_FAIL && 0 );
+define('FB_DEBUG_FORCE',!DEBUG_CLI && !DEBUG_FORCE_FAIL || 1 );
 
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
@@ -31,7 +32,7 @@ define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
 
 
 define('AUTO_FB_COOKIE',DEBUG_FB);
-define('AUTO_FB_COOKIE_ONE',DEBUG_FB && 0);
+define('AUTO_FB_COOKIE_ONE',DEBUG_FB && 1);
 define('DEBUG_FDB',FB_DEBUG_FORCE || (DEBUG_FB && LOCAL));
 define('FB_DEBUG_ERROR', 0);
 define('FB_RECOND_CONTENT',FB_DEBUG_FORCE);
@@ -229,12 +230,12 @@ function fb_query($sql,$con = null,$mysqli = false){
 
 function debug_dev_dir()
 {
-  return FB_DEBUG_INDEX || (isset($_SERVER['REQUEST_URI'])&&strpos($_SERVER['REQUEST_URI'], '/debug/'))!==false;
+  return FB_DEBUG_INDEX || strpos(SGS('REQUEST_URI'), '/debug/')!==false;
 }
 
 function debug_index()
 {
-  if(!defined('FB_DEBUG_MIAN'))define('FB_DEBUG_MIAN',isset($_SERVER["REQUEST_URI"]) && in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php')));
+  if(!defined('FB_DEBUG_MIAN'))define('FB_DEBUG_MIAN',strpos(SGS('HTTP_HOST'), 'debug.')===0 || (isset($_SERVER["REQUEST_URI"]) && in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'))));
   return  FB_DEBUG_MIAN || 
          in_array($_SERVER['SCRIPT_NAME'],array('/debug/index.php','/debug/dev/xdebug-trace.php','/debug/dev/db-debug.php',
           '/dev/xdebug-trace.php','/dev/db-debug.php'));
@@ -247,12 +248,13 @@ function data_cleanup()
   static $called = false;
   if ($called) return;
   else $called = true;
-  if (DEBUG_FDB_FILE && !debug_dev_dir()) {
+    $dev = debug_dev_dir();
+  if (DEBUG_FDB_FILE && !$dev) {
     $_SERVER['FB_DATA']['record']['data'] = $_SERVER['FB_GLO_DATA'];
     file_put_contents(DEBUG_FDB_FILE, serialize($_SERVER['FB_DATA']['record']));
   }
   $content = ob_get_contents();
-  if(FB_RECOND_CONTENT)fd($content,true);
+  if(FB_RECOND_CONTENT && !$dev)fd($content,true);
   if(DEBUG_REPLAY)
   {
     ob_end_clean();
@@ -268,7 +270,7 @@ function data_cleanup()
       if($content{0}!=='<'&&substr($content, -1)!=='>')return;
       if(strpos($content,'<?xml')===0||stristr($content,'</')===false)return;
       }
-      echo debug_console();
+      if($content!='' || FB_DEBUG_INDEX)echo debug_console();
   }
 }
 
