@@ -17,7 +17,7 @@ define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
 define('DEBUG_HIST_FILE',DEBUG_TEMP.'/xdebug-history.html');
 define('DEBUG_FORCE_FAIL',file_exists(DEBUG_LIST_FILE) && time()-filectime(DEBUG_LIST_FILE)>1200);
 
-define('FB_DEBUG_FORCE',!DEBUG_CLI && !DEBUG_FORCE_FAIL || 1 );
+define('FB_DEBUG_FORCE',!DEBUG_CLI && !DEBUG_FORCE_FAIL && 0 );
 
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
@@ -146,10 +146,10 @@ function frecord()
     'uri'=>XDEBUG_HTTP_HOST.SGS('REQUEST_URI'),
     'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
   define('FB_HIST_LOG',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" title="'.SGS('REMOTE_ADDR').'" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.SGS('REQUEST_METHOD').':'.SGS('REQUEST_URI').'</a>('.SGS("HTTP_HOST").'-<a target="_blank" href="https://www.baidu.com/s?wd='.SGS('REMOTE_ADDR').'" ><font color="darkblue">'.SGS('REMOTE_ADDR').'</font></a>)<br/>');
-  if(!FB_DEBUG_INDEX)file_put_contents(DEBUG_HIST_FILE,FB_HIST_LOG,FILE_APPEND); 
+  if(!FB_DEBUG_INDEX)file_put_contents(DEBUG_HIST_FILE,file_exists(DEBUG_HIST_FILE)?FB_HIST_LOG.file_get_contents(DEBUG_HIST_FILE):'');
   if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && !debug_index())
   {
-   file_put_contents(DEBUG_LIST_FILE,FB_HIST_LOG,FILE_APPEND); 
+   file_put_contents(DEBUG_LIST_FILE,FB_HIST_LOG,FILE_APPEND);
    if(AUTO_FB_COOKIE)fc($fb_data);
   }
   $fb_data['url']=XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME;
