@@ -17,7 +17,7 @@ define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
 define('DEBUG_HIST_FILE',DEBUG_TEMP.'/xdebug-history.html');
 define('DEBUG_FORCE_FAIL',file_exists(DEBUG_LIST_FILE) && time()-filectime(DEBUG_LIST_FILE)>1200);
 
-define('FB_DEBUG_FORCE',!DEBUG_CLI && !DEBUG_FORCE_FAIL && 0 );
+define('FB_DEBUG_FORCE',!DEBUG_CLI && !DEBUG_FORCE_FAIL || 0 );
 
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
@@ -121,7 +121,7 @@ function fd($var,$dlog = false)
  if($dlog)file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME.'.log',$var);
  else file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',var_export($var,true)."\r\n",FILE_APPEND);
 }
-function fe($a){var_dump($a);exit;}
+function fe($a){debug_raw($a);exit;}
 
  function ff()
  {
