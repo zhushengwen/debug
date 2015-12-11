@@ -628,7 +628,7 @@ function debug_pre($string, $h2_title = null, $max_lines = null, $style='')
 	$string = str_replace('&lt;small&gt;','<small></small>',$string);
 	$string = str_replace('&lt;/small&gt;','</small>',$string);
 	$string = str_replace("#cc0000'&gt;","#cc0000'>",$string);
-	$string = str_replace("#3465a4'&gt;","#3465a4'>",$string);	
+	$string = str_replace("#3465a4'&gt;","#3465a4'>",$string);
 	//if (strlen($string) > 50000) $string = substr($string,0,50000).'[debug: more than 50K chars]';
 	static $pre_id = 0;
 	$pre_id++;
@@ -1307,7 +1307,7 @@ function debug_console($display=false)
 	}
     if(defined('DEBUG_CONSOLE') && !DEBUG_CONSOLE) return;
     if(DEBUG_AJAX)return;
-    
+
 	global  $Db;
 
 	$db_time = null;
@@ -1328,7 +1328,7 @@ function debug_console($display=false)
 	if (isset($db_time) && isset($db_cqueries)) {
 		$db_enabled = true;
 	}
-	
+
 	static $called = false;
 	if ($called) {
 		return;
@@ -1337,13 +1337,13 @@ function debug_console($display=false)
 	}
 
 	$memory = memory_get_peak_usage() - DEBUG_CONSOLE_MEMORY;
-	
+
 	if ($memory < 1024) $memory = number_format(($memory)/1024,2).' KB';
 	else if ($memory < 1024*1024) $memory = round(($memory)/1024).' KB';
 	else $memory = number_format(($memory)/(1024*1024),2).' MB';
-	
+
 	$mysql_time = isset($db_time) ? $db_time : 0;
-	
+
 	$php_time = number_format(microtime(true) - DEBUG_CONSOLE_TIME - $mysql_time, 2);
 	$mysql_time = $mysql_time ? number_format($mysql_time, 2) : 'none';
 	$hide = DEBUG_COOKIE == -1?'show':'hide';
@@ -1351,9 +1351,21 @@ function debug_console($display=false)
 	$ret .= "<div>php: $php_time";
 	if ($_SERVER['FB_DATA'] || $Db) $ret .= " - mysql: $mysql_time ";
 	$ret .= " - mem: $memory</div>";
-
 	$ret .= '<div>';
-	if(FB_DEBUG_MIAN)$ret .= '<a title="look history" target="_blank" href="?hist">history</a> - ';
+	//if(FB_DEBUG_MIAN)
+	{
+		$err = DEBUG_TEMP.'/xdebug-error.'.XDEBUG_TIME.'.html';
+		if(file_exists($err)){
+			$ret .= '<a target="_blank" href="'.XDEBUG_HTTP_HOST.DEBUG_DIR.'/?timeouterr='.XDEBUG_TIME.'">Error</a> - ';
+		}
+		$ret .= '<a title="look history" target="_blank" href="'.XDEBUG_HTTP_HOST.DEBUG_DIR.'/?hist">hist</a> - ';
+		$log = DEBUG_TEMP.'/'.XDEBUG_TIME_REAL.'.log';
+		if(file_exists($log)){
+			$ret .= '<a target = "_blank" href = "'.XDEBUG_HTTP_HOST.DEBUG_DIR.'/?timelog='.XDEBUG_TIME_REAL.'" > Log</a> - ';
+		}
+	}
+
+
 	$ret .= '<a href="javascript:debug_cookie_toggle();">'.$hide.'</a> - <a href="javascript:debug_cookie_clear();">clear</a>';
 	if (((defined('DEBUG_FDB') && DEBUG_FDB) || (defined('DbDebug') && DbDebug)) && defined('DEBUG_FDB_SCRIPT_TIME') && $db_enabled) {
 		$ret .= ' - <a href="javascript:void(0)" id="fa_db_'.XDEBUG_TIME.'" onclick="debug_popup(\''.DEBUG_FDB_SCRIPT_TIME.'\',800,500)">db ('.$db_cqueries.')</a>';
@@ -1366,7 +1378,7 @@ function debug_console($display=false)
 		} else {
 			$ret .= ' trace ';
 		}
-		
+
 		$ret .= '<a class="'.(DEBUG_COOKIE?'stop':'start').'" href="javascript:void(0)" onclick="if(debug_cookie_get(\'xdebug-trace\')) {this.innerHTML=\'[stop]\'; this.className=\'stop\'; debug_cookie_del(\'xdebug-trace\');debug_cookie_clear(); location.reload();} else {this.innerHTML=\'[start]\'; this.className=\'start\'; debug_cookie_set(\'xdebug-trace\',1);location.reload();}">['.(DEBUG_COOKIE?'stop':'start').']</a>';
 	}
 	$ret .= "</div>";

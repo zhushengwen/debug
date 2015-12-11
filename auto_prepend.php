@@ -17,7 +17,7 @@ define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
 define('DEBUG_HIST_FILE',DEBUG_TEMP.'/xdebug-history.html');
 define('DEBUG_FORCE_FAIL',file_exists(DEBUG_LIST_FILE) && time()-filectime(DEBUG_LIST_FILE)>1200);
 
-define('FB_DEBUG_FORCE',!DEBUG_CLI && !DEBUG_FORCE_FAIL || 0 );
+define('FB_DEBUG_FORCE',!DEBUG_CLI && !DEBUG_FORCE_FAIL && 0 );
 
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
@@ -89,6 +89,10 @@ function stack()
 
 
 function fb_error_handler($errno, $errstr, $file, $line){
+  $map = array(
+    '/data/www/projects/'=>'E:/work/'
+  );
+$file = str_replace(array_keys($map),array_values($map),$file);
 static $ec=0;$ec++;
 $html="<strong>$ec</strong>:$errstr::$file:<a href='notepad2://".$file."/?$line'>$line</a><br/>";
 $call = 0;
