@@ -116,6 +116,8 @@ foreach ($data['debug_queries'] as $k => $row)
 
 	if (preg_match('#^\s*SELECT\s+#i', $row['query'])) {
 		$type = 'SELECT';
+	}else if (preg_match('#^\s*SHOW\s+#i', $row['query'])) {
+		$type = 'SHOW';
 	} else if (preg_match('#^\s*DELETE\s+#i', $row['query'])) {
 		$type = 'DELETE';
 	} else if (preg_match('#^\s*UPDATE\s+#i', $row['query'])) {
@@ -158,6 +160,9 @@ function query_type_color($type)
 	switch ($type) {
 		case 'SELECT':
 			$color = 'green';
+			break;
+		case 'SHOW':
+			$color = 'peru';
 			break;
 		case 'UPDATE':
 			$color = '#ff00ff';
@@ -385,7 +390,7 @@ function scroll(dest)
 			<?php endif; ?>
 			<td valign="top"><?php echo query_type_color($query['type']);?></td>
 			<td align="center">
-				<?php if (preg_match('#^\s*SELECT#i', $query['query'])): ?>
+				<?php if (preg_match('#^\s*(SELECT|SHOW)#i', $query['query'])): ?>
 					<a style="color: #000;" href="javascript:void(0)" onclick="toggle(<?php echo $query['id'];?>)">&gt;&gt;</a>
 				<?php else: ?>
 					-
