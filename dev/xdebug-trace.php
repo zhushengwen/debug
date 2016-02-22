@@ -107,8 +107,9 @@ if($xthandle)
 		}
 		if (!$row) continue;
 		if ($first_row) { $first_row = false; $prev = $row; continue; }
-		if ('data_cleanup' == $row['func']) break;
 
+		if ('function_exists' == $row['func'] && $row['param'] == "&apos;data_cleanup&apos;")break;
+		if ('data_cleanup' == $row['func']) break;
 		if ($row['func'])
 		{
 			$total_calls++;
@@ -295,7 +296,7 @@ function parse_line($line)
 	$row['param'] = implode("\r\n",$arr);
 	}
 	else $row['param'] = 'void';
-	
+
 
 	return $row;
 }
@@ -664,7 +665,7 @@ function open_trace(id){
 							if (!is_expanded) base_a.className = base_a.className.replace(reg_collapsed, 'expanded');
 							//if (!is_expanded) expand_func(call_id);
 						}
-						
+
 						base_depth--;
 					}
 					call_id--;
@@ -789,7 +790,7 @@ function scroll_current_pos()
 	}
 	$summary = array_msort($summary, array('count'=>SORT_DESC, 'func'=>SORT_ASC));
 ?>
-<?php 
+<?php
 
 $debug_time = isset($_GET['time'])?$_GET['time']:$_SERVER['QUERY_STRING'];
 $data_file = DEBUG_FDB_ORG.'.'.$debug_time;
@@ -833,21 +834,21 @@ if(!ajax){
 		replay_form.action = l;
 	    replay_form.target = "replay_frm";
 	    replay_form.method = method;
-	    replay_form.style.display="none";		
+	    replay_form.style.display="none";
 		document.body.appendChild(replay_form);
 
 		var ifm=document.createElement("iframe");
 		ifm.name="replay_frm";
 		ifm.style.display="none";
 		document.body.appendChild(ifm);
-		var load=function(){ 
-		debug_popup(getUrl(ifm.contentWindow.document.body.innerHTML)); 
+		var load=function(){
+		debug_popup(getUrl(ifm.contentWindow.document.body.innerHTML));
 		}
 		if(ifm.attachEvent){
 		ifm.attachEvent("onload", load);
 		}else{
 		ifm.onload = load;
-	   	}   
+	   	}
 
 
 	    var ar=d.split('&');
@@ -978,22 +979,24 @@ function debug_list()
         if (a.length == 2) {
             a[0] = a[0].replace(/^\s*|\s*$/g, '');
             a[1] = a[1].replace(/^\s*|\s*$/g, '');
-            if(/^\d{4}\.\d{2}:\d{2}:\d{2}$/.test(a[0])) 
+            if(/^\d{4}\.\d{2}:\d{2}:\d{2}$/.test(a[0]))
             	list.push(JSON.parse(unescape(a[1])));
         }
     }
-	
+
 	var html = '<div>DebugList -<a href="javascript:debug_cookie_clear();">clear</a>- Count('+list.length+')</div>';
 	for(var i=list.length-1;i>=0;i--)
 	{
 		var s = list[i].uri;
-		var r = s.indexOf('://');
-		var t = s.indexOf('/',r+3);
-		if(s.length-t>40)
-		{
-			s = s.substr(t,10)+'...'+s.substr(-30);
-		}else s=s.substr(t);
-		html += '<div><a title="'+list[i].uri+'" style="color:'+ (uri==list[i].uri?'blue':'black')+';" href="'+list[i].uri+'" target="_blank">'+list[i].method+'</a>:<a'+ (uri==list[i].uri?' style="color:blue;"':'')+' title="'+list[i].uri+'" href="javascript:'+ list[i].url  +';void(0);">'+s+'</a></div>';
+		if(s){
+			var r = s.indexOf('://');
+			var t = s.indexOf('/',r+3);
+			if(s.length-t>40)
+			{
+				s = s.substr(t,10)+'...'+s.substr(-30);
+			}else s=s.substr(t);
+			html += '<div><a title="'+list[i].uri+'" style="color:'+ (uri==list[i].uri?'blue':'black')+';" href="'+list[i].uri+'" target="_blank">'+list[i].method+'</a>:<a'+ (uri==list[i].uri?' style="color:blue;"':'')+' title="'+list[i].uri+'" href="javascript:'+ list[i].url  +';void(0);">'+s+'</a></div>';
+		}
 	}
 
 
