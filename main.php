@@ -30,7 +30,7 @@ define('XDEBUG_TIME',(microtime(1)*10000).rand(1000,9999));
 define('XDEBUG_TIME_REAL',intval(XDEBUG_TIME/100000000));
 define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
 
-
+define('AUTO_EXPAND_CONTROLLER',1);
 define('AUTO_FB_COOKIE',0);
 define('AUTO_FB_COOKIE_ONE',AUTO_FB_COOKIE && 1);
 define('DEBUG_FDB',FB_DEBUG_FORCE || (DEBUG_FB && LOCAL));

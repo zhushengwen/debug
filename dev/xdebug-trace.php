@@ -667,11 +667,13 @@ function open_trace(id){
 	}
 }
 <?php
-if($controller_max_line)echo "if(!this.onload)this.onload = function(){open_tr($controller_max_line);};";
+if(AUTO_EXPAND_CONTROLLER && $controller_max_line)echo "if(!this.onload)this.onload = function(){open_tr($controller_max_line);};";
 ?>
+
 function open_tr(call_id){
 		var dest = 'tr_'+call_id;
 		var base_tr = $(dest);
+		var first = true;
 		if(base_tr){
 			var base_depth = parseInt(base_tr.getAttribute('depth'));
 			while(base_depth && call_id){
@@ -681,8 +683,8 @@ function open_tr(call_id){
 					var base_a = $('a_'+call_id);
 					if(base_a){
 						var is_expanded = reg_expanded.test(base_a.className);
-						if (!is_expanded) base_a.className = base_a.className.replace(reg_collapsed, 'expanded');
-						//if (!is_expanded) expand_func(call_id);
+						if (!is_expanded && first) expand_func(call_id);
+						first = false;
 					}
 
 					base_depth--;
