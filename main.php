@@ -31,8 +31,8 @@ define('XDEBUG_TIME_REAL',intval(XDEBUG_TIME/100000000));
 define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
 
 
-define('AUTO_FB_COOKIE',DEBUG_FB);
-define('AUTO_FB_COOKIE_ONE',DEBUG_FB && 1);
+define('AUTO_FB_COOKIE',0);
+define('AUTO_FB_COOKIE_ONE',AUTO_FB_COOKIE && 1);
 define('DEBUG_FDB',FB_DEBUG_FORCE || (DEBUG_FB && LOCAL));
 define('FB_DEBUG_ERROR', 0);
 define('FB_RECOND_CONTENT',FB_DEBUG_FORCE);
@@ -198,6 +198,19 @@ function frecord()
 					if(!function_exists($_SERVER['mysqli_query']))
 						runkit_function_copy('mysqli_query',$_SERVER['mysqli_query']);
 					runkit_function_redefine('mysqli_query','$con,$sql','return fb_query($sql,$con,true);');
+
+					$_SERVER['json_encode'] = 'json_encode_back';
+					if(!function_exists($_SERVER['json_encode']))
+					{
+						runkit_function_copy('json_encode',$_SERVER['json_encode']);
+						//runkit_function_redefine('json_encode','$data',"return @preg_replace(\"#\\\\\\u([0-9a-f]+)#ie\", \"iconv('UCS-2', 'UTF-8', pack('H4', '\\\\1'))\", \$_SERVER['json_encode'](\$data));");
+						if (version_compare("5.3", PHP_VERSION, "<")) {
+							runkit_function_redefine('json_encode','$data','return $_SERVER[\'json_encode\']($data,JSON_UNESCAPED_UNICODE);');
+						}else
+						{
+							runkit_function_redefine('json_encode','$data',"return preg_replace_callback(\"#\\\\\\u([0-9a-f]{4})#i\", function (\$matches){return iconv('UCS-2', 'UTF-8', pack('H4', \$matches[1]));}, \$_SERVER['json_encode'](\$data));");
+						}
+					}
 				}else {
 					$_SERVER['mysql_query']='mysql_query';
 					$_SERVER['mysqli_query']='mysqli_query';

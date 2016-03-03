@@ -15,6 +15,8 @@ $memorystart = memory_get_usage();
 $show_headers = false;
 $show_debug = false;
 $included_files = array();
+
+$controller_max_line = 0;
 function pf($file)
 {
 	if(strpos($file, 'auto_prepend.php')!==false||strpos($file, 'lib/db-mysql.php')!==false)return;
@@ -108,6 +110,8 @@ if($xthandle)
 		if (!$row) continue;
 		if ($first_row) { $first_row = false; $prev = $row; continue; }
 
+
+
 		if ('function_exists' == $row['func'] && $row['param'] == "&apos;data_cleanup&apos;")break;
 		if ('data_cleanup' == $row['func']) break;
 		if ($row['func'])
@@ -137,7 +141,7 @@ if($xthandle)
 				$chunked_trace = array();
 			}
 
-			if ($func['is_nested'] || $func['include']) {
+			if ($func['is_nested'] || $func['include'] || true) {
 				$chunked_trace[] = $func;
 			} else if (isset($chunked_trace[$func['func']])) {
 				$chunked_trace[$func['func']]['func_count']++;
@@ -153,6 +157,12 @@ if($xthandle)
 			$prev_func = $func;
 		} else {
 			$next = null;
+		}
+		if (strpos($row['func'],'->'))
+		{
+			list($class,$method) = explode('->',$row['func']);
+			if(strpos(strtoupper($class),'CONTROLLER') !== FALSE && !in_array($method,array('before','after')))
+			$controller_max_line = $total_calls;
 		}
 		$prev = $row;
 	}
@@ -286,6 +296,8 @@ function parse_line($line)
         {
             $val = substr($val,0,$i).' = '.var_export(eval('return '.$val.';'),true);
         }else if(stripos($val,'array ')===0){
+	          $val = str_replace('$$','\$',$val);
+	          $val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$val);
             $val = var_export(eval('return '.$val.';'),true);
         }
         $val = str_replace("'",'&apos;',$val);
@@ -651,29 +663,36 @@ function open_trace(id){
 	var dba = $('sql_'+id);
 	if(dba){
 		var call_id = parseInt(dba.getAttribute('cid'));
+		if(call_id) open_tr(call_id);
+	}
+}
+<?php
+if($controller_max_line)echo "if(!this.onload)this.onload = function(){open_tr($controller_max_line);};";
+?>
+function open_tr(call_id){
 		var dest = 'tr_'+call_id;
 		var base_tr = $(dest);
 		if(base_tr){
 			var base_depth = parseInt(base_tr.getAttribute('depth'));
 			while(base_depth && call_id){
 				if(base_tr && parseInt(base_tr.getAttribute('depth'))<=base_depth)
-					{
-						base_tr.style.display = '';
-						var base_a = $('a_'+call_id);
-						if(base_a){
-							var is_expanded = reg_expanded.test(base_a.className);
-							if (!is_expanded) base_a.className = base_a.className.replace(reg_collapsed, 'expanded');
-							//if (!is_expanded) expand_func(call_id);
-						}
-
-						base_depth--;
+				{
+					base_tr.style.display = '';
+					var base_a = $('a_'+call_id);
+					if(base_a){
+						var is_expanded = reg_expanded.test(base_a.className);
+						if (!is_expanded) base_a.className = base_a.className.replace(reg_collapsed, 'expanded');
+						//if (!is_expanded) expand_func(call_id);
 					}
-					call_id--;
-					base_tr = $('tr_'+call_id);
+
+					base_depth--;
+				}
+				call_id--;
+				base_tr = $('tr_'+call_id);
 			}
 			scroll(dest);
 		}
-	}
+
 }
 function scroll(dest, ignore_when_top)
 {
