@@ -225,7 +225,32 @@ if($xthandle)
 	}
 }
 
-
+function formate_class($str)
+{
+	$str = str_replace("\t","\\\\//",$str);
+	$splish = explode('; ',$str);
+	$retstr = '';
+	$stack = 0;
+	foreach($splish as $key => $val)
+	{
+		if($key) $retstr .= ";\n".str_repeat("\t",$stack);
+		$lsplish = explode(' { ',$val);
+		foreach($lsplish as $lkey => $lval)
+		{
+			if($lkey){$retstr .= " { \n".str_repeat("\t",$stack+1);$stack++;}
+			$rsplish = explode(' }',$lval);
+			foreach($rsplish as $rkey => $rval)
+			{
+				if($rkey){$stack--;$retstr .= "\n".str_repeat("\t",$stack)." }";}
+				$rval = str_replace("\n","\n".str_repeat("\t",$stack+2),$rval);
+				$retstr .= $rval;
+			}
+		}
+	}
+	$retstr = str_replace("\\\\//","\n",$retstr);
+	$retstr = preg_replace("/{[ \t\n\.]+}/",'{  }',$retstr);
+	return $retstr;
+}
 // wykorzystana zmienna $row z petli, nie przenosic tych linijek
 //$total_memory = $row['memory'];
 
@@ -286,33 +311,44 @@ function parse_line($line)
 	$row['line'] = $tabs[9];
 	if($tabs[10])
 	{
-	$row['pcount'] = $tabs[10];
-	$arr = array_slice($tabs,11,$row['pcount']);
-	foreach($arr as &$val)
-	{
-		if (preg_match ("#\\\\\\\\u([0-9a-f]{4})#ie", $val))
+		$row['pcount'] = $tabs[10];
+		$arr = array_slice($tabs,11,$row['pcount']);
+		foreach($arr as &$val)
 		{
-			$val = preg_replace("#\\\\\\\\u([0-9a-f]{4})#ie", "iconv('UCS-2', 'UTF-8', pack('H4', '\\1'))", $val);
+			if (preg_match ("#\\\\\\\\u([0-9a-f]{4})#ie", $val))
+			{
+				$val = preg_replace("#\\\\\\\\u([0-9a-f]{4})#ie", "iconv('UCS-2', 'UTF-8', pack('H4', '\\1'))", $val);
+			}
+			$val = str_replace("\\n","\n",$val);
+
+			if(strpos($val,'class') === 0)
+			{
+				$val = formate_class($val);
+			}
+			else
+			{
+				$i = stripos($val,' = array ');
+
+				if($i!==false)
+				{
+					$val = substr($val,0,$i).' = '.var_export(eval('return '.$val.';'),true);
+				}else if(stripos($val,'array ')===0){
+					$val = str_replace('$$','\$',$val);
+					$val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$val);
+					$val = var_export(eval('return '.$val.';'),true);
+				}else
+				{
+
+
+
+				}
+			}
+
+	    $val = str_replace("'",'&apos;',$val);
+	    $val = str_replace('"','&quot;',$val);
+	    $val = str_replace('<','&lt;',$val);
+	    $val = str_replace('>','&gt;',$val);
 		}
-
-		$i = stripos($val,' = array ');
-
-        if($i!==false)
-        {
-            $val = substr($val,0,$i).' = '.var_export(eval('return '.$val.';'),true);
-        }else if(stripos($val,'array ')===0){
-	          $val = str_replace('$$','\$',$val);
-	          $val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$val);
-            $val = var_export(eval('return '.$val.';'),true);
-        }else
-        {
-	        $val = $val;
-        }
-        $val = str_replace("'",'&apos;',$val);
-        $val = str_replace('"','&quot;',$val);
-        $val = str_replace('<','&lt;',$val);
-        $val = str_replace('>','&gt;',$val);
-	}
 	$row['param'] = implode("\r\n",$arr);
 	}
 	else $row['param'] = 'void';
