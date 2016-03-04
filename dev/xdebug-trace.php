@@ -290,7 +290,12 @@ function parse_line($line)
 	$arr = array_slice($tabs,11,$row['pcount']);
 	foreach($arr as &$val)
 	{
-        $i = stripos($val,' = array ');
+		if (preg_match ("#\\\\\\\\u([0-9a-f]{4})#ie", $val))
+		{
+			$val = preg_replace("#\\\\\\\\u([0-9a-f]{4})#ie", "iconv('UCS-2', 'UTF-8', pack('H4', '\\1'))", $val);
+		}
+
+		$i = stripos($val,' = array ');
 
         if($i!==false)
         {
@@ -299,6 +304,9 @@ function parse_line($line)
 	          $val = str_replace('$$','\$',$val);
 	          $val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$val);
             $val = var_export(eval('return '.$val.';'),true);
+        }else
+        {
+	        $val = $val;
         }
         $val = str_replace("'",'&apos;',$val);
         $val = str_replace('"','&quot;',$val);
@@ -791,7 +799,7 @@ function scroll_current_pos()
 	<td nowrap align="center"><?php echo $trace['call_id'];?></td>
 	<td nowrap align="center"><?php echo $trace['depth'];?></td>
 	<td nowrap><?php echo func_time(isset($trace['time_nested']) ? $trace['time_nested'] : $trace['time']);?></td>
-	<td nowrap title="<?php echo $trace['param'];?>"><?php echo $indent[$depth];?><?php if ($trace['is_nested']):?><a id="a_<?php echo $trace['call_id'];?>" class="<?php echo $func_class;?> collapsed" href="javascript:expand_func(<?php echo $trace['call_id'];?>)"><?php else:?><span class="<?php echo $func_class;?>"><?php endif;?><?php echo fb_link_db($trace['func'],$trace['param'],$trace['call_id']);?><?php echo $trace['is_nested']?'</a>':'</span>';?><?php if ($trace['include']): ?>: <?php echo ps(fpath($trace['include']));?><?php endif; ?>
+	<td nowrap title="<?php echo $trace['param'];?>" ondblclick="l(this)"><?php echo $indent[$depth];?><?php if ($trace['is_nested']):?><a id="a_<?php echo $trace['call_id'];?>" class="<?php echo $func_class;?> collapsed" href="javascript:expand_func(<?php echo $trace['call_id'];?>)"><?php else:?><span class="<?php echo $func_class;?>"><?php endif;?><?php echo fb_link_db($trace['func'],$trace['param'],$trace['call_id']);?><?php echo $trace['is_nested']?'</a>':'</span>';?><?php if ($trace['include']): ?>: <?php echo ps(fpath($trace['include']));?><?php endif; ?>
 	</td>
 	<td nowrap align="center"><?php if (isset($trace['nested_calls'])):?><?php echo $trace['nested_calls']+$trace['func_count'];?><?php else:?><?php echo $trace['func_count']>1?$trace['func_count']:'';?><?php endif;?></td>
 	<td nowrap><?php echo pt(fpath($trace['file']),$trace['line'],$trace['param']);?></td>
@@ -951,6 +959,7 @@ else{
 <?php if($included_files) echo debug_included_files($included_files);?>
 </body>
 <script>
+function l(td){console.log(td.title);}
 function debug_cookie_set(name, value)
 {
     var cookie = (name + '=' + escape(value));
