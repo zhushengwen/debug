@@ -239,7 +239,7 @@ function fb_query($sql,$con = null,$mysqli = false){
 	if (DEBUG_FDB) {
 		db_empty($_SERVER['FB_DATA']['debug_count']+1,$sql);
 	}
-	if(function_exists('db_query'))return db_query($sql,$con,$mysqli);
+	if(function_exists('fb_db_query'))return fb_db_query($sql,$con,$mysqli);
 	else if($mysqli)return mysqli_query($con,$sql);
 	else if($con)return mysql_query($sql,$con);
 	else return mysql_query($sql);

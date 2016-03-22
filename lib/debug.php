@@ -70,7 +70,7 @@ function debug_error($error_no, $error_msg, $error_file, $error_line, $error_con
 	$error_context = debug_error_context($error_context);
 
 	$dbmsg = false;
-	if (function_exists('db_query')
+	if (function_exists('fb_db_query')
 		&& preg_match('/db\-(mysql|pgsql|mssql|oracle|sqlite)\.php$/', basename($trace[0]['file'])))
 	{
 		$trace = debug_trace($trace, __FILE__, '/db\-(mysql|pgsql|mssql|oracle|sqlite)\.php$/');
@@ -84,7 +84,7 @@ function debug_error($error_no, $error_msg, $error_file, $error_line, $error_con
 			$query = trim($query);
 		}
 		$error['db_error'] = $error_msg;
-		if ($query)	$error['db_query'] = $query;
+		if ($query)	$error['fb_db_query'] = $query;
 		if (isset($error_context['query_base'])) unset($error_context['query_base']);
 		if (isset($error_context['query'])) unset($error_context['query']);
 	} else {

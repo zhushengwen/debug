@@ -248,7 +248,7 @@ function formate_class($str)
 		}
 	}
 	$retstr = str_replace("\\\\//","\n",$retstr);
-	$retstr = preg_replace("/{[ \t\n\.]+}/",'{  }',$retstr);
+	$retstr = preg_replace("/{[ \t\n\.]+}/",'{ ... }',$retstr);
 	return $retstr;
 }
 // wykorzystana zmienna $row z petli, nie przenosic tych linijek
