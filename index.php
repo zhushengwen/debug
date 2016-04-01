@@ -4,7 +4,7 @@ if(isset($_GET['timelog']))
 {
 	$log = DEBUG_TEMP.'/'.date('Y-m-d',$_GET['timelog']/100000000).'.log';
 	if(file_exists($log)){
-	   echo file_get_contents($log);
+	   echo str_replace("\r\n",'<br/>',file_get_contents($log));
 	   unlink($log);
 	}
 	exit;

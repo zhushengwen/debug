@@ -123,7 +123,7 @@ set_error_handler('fb_error_handler');
 function fd($var,$dlog = false)
 {
 	if($dlog)file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME.'.log',$var);
-	else file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',var_export($var,true)."\r\n",FILE_APPEND);
+	else file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',trim(var_export($var,true),"''")."\r\n",FILE_APPEND);
 }
 function fe($a){debug_raw($a);exit;}
 
@@ -205,7 +205,7 @@ function frecord()
 						runkit_function_copy('json_encode',$_SERVER['json_encode']);
 						//runkit_function_redefine('json_encode','$data',"return @preg_replace(\"#\\\\\\u([0-9a-f]+)#ie\", \"iconv('UCS-2', 'UTF-8', pack('H4', '\\\\1'))\", \$_SERVER['json_encode'](\$data));");
 						if (version_compare("5.3", PHP_VERSION, "<")) {
-							runkit_function_redefine('json_encode','$data','return $_SERVER[\'json_encode\']($data,JSON_UNESCAPED_UNICODE);');
+							runkit_function_redefine('json_encode','$data,$parm=null','return $_SERVER[\'json_encode\']($data, $parm?:JSON_UNESCAPED_UNICODE);');
 						}else
 						{
 							runkit_function_redefine('json_encode','$data',"return preg_replace_callback(\"#\\\\\\u([0-9a-f]{4})#i\", function (\$matches){return iconv('UCS-2', 'UTF-8', pack('H4', \$matches[1]));}, \$_SERVER['json_encode'](\$data));");
