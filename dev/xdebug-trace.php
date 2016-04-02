@@ -327,8 +327,8 @@ function parse_line($line)
 			}
 			else
 			{
+				$val = str_replace('array (...)',"'[...]'",$val);
 				$i = stripos($val,' = array ');
-
 				if($i!==false)
 				{
 					$val = substr($val,0,$i).' = '.var_export(eval('return '.$val.';'),true);
@@ -336,12 +336,8 @@ function parse_line($line)
 					$val = str_replace('$$','\$',$val);
 					$val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$val);
 					$val = var_export(eval('return '.$val.';'),true);
-				}else
-				{
-
-
-
 				}
+				$val = str_replace("'[...]'",'[...]',$val);
 			}
 
 	    $val = str_replace("'",'&apos;',$val);
