@@ -118,7 +118,7 @@ function fb_error_handler($errno, $errstr, $file, $line){
 	if($call)call_user_func_array($fun, $param_arr);
 	return true;
 }
-set_error_handler('fb_error_handler');
+if(!FB_DEBUG_INDEX)set_error_handler('fb_error_handler');
 
 function fd($var,$dlog = false)
 {

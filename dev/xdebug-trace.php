@@ -266,7 +266,7 @@ function parse_line($line)
 	static $start_depth;
 	if (null === $start_depth) {
 		if (5 == $count_tabs) return array('func'=>false, 'time'=>$tabs[3], 'memory'=>$tabs[4]);
-		if ('debug.php' == basename($tabs[8])) return false;
+		if ($count_tabs > 8 && 'debug.php' == basename($tabs[8])) return false;
 		if ('{main}' == $tabs[5]) return false;
 		$start_depth = $tabs[0];
 	}
@@ -306,10 +306,10 @@ function parse_line($line)
 	$row['time'] = $tabs[3];
 	$row['memory'] = $tabs[4];
 	$row['func'] = $tabs[5];
-	$row['include'] = $tabs[7];
-	$row['file'] = $tabs[8];
-	$row['line'] = $tabs[9];
-	if($tabs[10])
+	if($count_tabs>7)$row['include'] = $tabs[7];
+	if($count_tabs>8)$row['file'] = $tabs[8];
+	if($count_tabs>9)$row['line'] = $tabs[9];
+	if($count_tabs>10)
 	{
 		$row['pcount'] = $tabs[10];
 		$arr = array_slice($tabs,11,$row['pcount']);
