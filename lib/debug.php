@@ -9,8 +9,6 @@ ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
 ini_set('date.timezone', 'Asia/Shanghai');
 register_shutdown_function('data_cleanup');
 if(FB_DEBUG_ERROR)set_error_handler('debug_error');
-define('DEBUG_CONSOLE_MEMORY',0);
-define('DEBUG_CONSOLE_TIME',0);
 function debug_record()
 {
 	foreach($GLOBALS as $k => $v)
