@@ -1,5 +1,7 @@
 <?php
 header("Content-type: text/html; charset=utf-8");
+define('DEBUG_CONSOLE_MEMORY', memory_get_usage());
+define('DEBUG_CONSOLE_TIME', microtime(1));
 if(isset($_GET['timelog']))
 {
 	$log = DEBUG_TEMP.'/'.date('Y-m-d',$_GET['timelog']/100000000).'.log';
