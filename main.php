@@ -125,7 +125,6 @@ function fd($var,$dlog = false)
 	if($dlog)file_put_contents(DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME.'.log',$var);
 	else file_put_contents(DEBUG_TEMP.'/'.date('Y-m-d',time()).'.log',trim(var_export($var,true),"''")."\r\n",FILE_APPEND);
 }
-function fe($a){debug_raw($a);exit;}
 
 function ff()
 {
