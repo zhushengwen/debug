@@ -46,7 +46,7 @@ define('dg','fb(get_defined_vars());');
 define('DEBUG_REPLAY',isset($_COOKIE['xdebug-replay']));
 define('FB_DEBUG_INDEX',debug_index());
 
-if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
+//if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
 if(DEBUG_REPLAY)setcookie("xdebug-replay",null,null,'/');
 function fb_debug_dir()
 {
@@ -274,6 +274,7 @@ function data_cleanup()
 	if(DEBUG_REPLAY)
 	{
 		ob_end_clean();
+		header('Access-Control-Allow-Origin:*');
 		echo '<url>'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'</url>';exit;
 	}
 	if(!DEBUG_AJAX && DEBUG_FB)
