@@ -17,6 +17,7 @@ $show_debug = false;
 $included_files = array();
 
 $controller_max_line = 0;
+$action_not_found = TRUE;
 function pf($file)
 {
 	if(strpos($file, 'auto_prepend.php')!==false||strpos($file, 'lib/db-mysql.php')!==false)return;
@@ -161,8 +162,12 @@ if($xthandle)
 		if (strpos($row['func'],'->'))
 		{
 			list($class,$method) = explode('->',$row['func']);
-			if(strpos(strtoupper($class),'CONTROLLER') !== FALSE && !in_array($method,array('before','after')))
-			$controller_max_line = $total_calls;
+			if($action_not_found && strpos(strtoupper($class),'CONTROLLER') !== FALSE && !in_array($method,array('before','after')))
+			{
+				$controller_max_line = $total_calls;
+				$action_not_found = !(strpos($method,'action_')===0);
+			}
+
 		}
 		$prev = $row;
 	}
