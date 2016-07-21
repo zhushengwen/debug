@@ -1,9 +1,8 @@
 <?php
 // PHP debug tools - http://www.gosu.pl/debug/
 // Author: Cezary Tomczak [cagret at gmail.com]
-
-error_reporting(0);
-ini_set('display_errors', true);
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
 ini_set('log_errors', 1);
 ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
 ini_set('date.timezone', 'Asia/Shanghai');
@@ -198,7 +197,7 @@ if($xthandle)
 		$real_total_memory += $func['memory'];
 	}
 
-	ob_start();
+	//ob_start();
 
 	if ($show_debug) echo '<div>Time: '.number_format(microtime(1)-$microstart,3).'</div>';
 
@@ -322,7 +321,7 @@ function parse_line($line)
 		{
 			if (preg_match ("#\\\\\\\\u([0-9a-f]{4})#ie", $val))
 			{
-				$val = preg_replace("#\\\\\\\\u([0-9a-f]{4})#ie", "iconv('UCS-2', 'UTF-8', pack('H4', '\\1'))", $val);
+				$val = @preg_replace("#\\\\\\\\u([0-9a-f]{4})#ie", "iconv('UCS-2', 'UTF-8', pack('H4', '\\1'))", $val);
 			}
 			$val = str_replace("\\n","\n",$val);
 
@@ -338,9 +337,9 @@ function parse_line($line)
 				{
 					$val = substr($val,0,$i).' = '.var_export(eval('return '.$val.';'),true);
 				}else if(stripos($val,'array ')===0){
-					$val = str_replace('$$','\$',$val);
-					$val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$val);
-					$val = var_export(eval('return '.$val.';'),true);
+					//$val = str_replace('$$','\$',$val);
+					//$val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$val);
+					//$val = var_export(eval('return '.$val.';'),true);
 				}
 				$val = str_replace("'[...]'",'[...]',$val);
 			}
