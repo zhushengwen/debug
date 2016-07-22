@@ -1,7 +1,7 @@
 <?php
 //require dirname(__FILE__).'/debug/auto_prepend.php';
 date_default_timezone_set("Asia/Shanghai");
-ob_start();
+
 define('DEBUG_FB',1);
 define('IS_GBK',0);
 defined('DEBUG_CONSOLE_HIDE');
@@ -45,6 +45,7 @@ define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X
 define('dg','fb(get_defined_vars());');
 define('DEBUG_REPLAY',isset($_COOKIE['xdebug-replay']));
 define('FB_DEBUG_INDEX',debug_index());
+if(!FB_DEBUG_INDEX)ob_start();
 
 //if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
 if(DEBUG_REPLAY)setcookie("xdebug-replay",null,null,'/');

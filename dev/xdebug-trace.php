@@ -97,7 +97,7 @@ $next_line = rtrim(fgets($xthandle,512));
 $chunked_trace = array();
 if($xthandle)
 {
-	while (!feof($xthandle))
+	while (!feof($xthandle) && $total_calls < 30000)
 	{
 		$line = $next_line;
 		$next_line = rtrim(fgets($xthandle));
