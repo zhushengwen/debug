@@ -344,7 +344,6 @@ function parse_line($line)
 					 $temp_val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$temp_val);
 					 try
 					 {
-						 $temp_val = $val;
 						 $val = @var_export(eval('return '.$temp_val.';'),true);
 					 }catch (Exception $e)
 					 {
