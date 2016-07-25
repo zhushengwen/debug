@@ -97,7 +97,7 @@ $next_line = rtrim(fgets($xthandle,512));
 $chunked_trace = array();
 if($xthandle)
 {
-	while (!feof($xthandle) && $total_calls < 30000)
+	while (!feof($xthandle) && $total_calls < 40000)
 	{
 		$line = $next_line;
 		$next_line = rtrim(fgets($xthandle));
@@ -332,14 +332,28 @@ function parse_line($line)
 			else
 			{
 				$val = str_replace('array (...)',"'[...]'",$val);
-				$i = stripos($val,' = array ');
-				if($i!==false)
+
+				if(strpos($line,"5710968"))
+				{
+					//exit($val);
+				}
+				 $i = stripos($val,' = array ');
+				 if(stripos($val,'array ')===0){
+					 $temp_val = preg_replace('/ \${[^}]+}:/',' $',$val);
+					 $temp_val = str_replace('$','\$',$temp_val);
+					 $temp_val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$temp_val);
+					 try
+					 {
+						 $temp_val = $val;
+						 $val = @var_export(eval('return '.$temp_val.';'),true);
+					 }catch (Exception $e)
+					 {
+
+					 }
+
+				}elseif($i!==false)
 				{
 					$val = substr($val,0,$i).' = '.var_export(eval('return '.$val.';'),true);
-				}else if(stripos($val,'array ')===0){
-					//$val = str_replace('$$','\$',$val);
-					//$val = preg_replace('/ => class ([^}]*)}/',' => "class ${1}}"',$val);
-					//$val = var_export(eval('return '.$val.';'),true);
 				}
 				$val = str_replace("'[...]'",'[...]',$val);
 			}
