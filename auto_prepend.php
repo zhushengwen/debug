@@ -1,5 +1,4 @@
 <?php
-define('DEBUG_FB',0);
 function fe($a){echo '<pre>';var_dump($a);echo '</pre>';exit;}
 function debug_index()
 {
@@ -9,7 +8,8 @@ function debug_index()
                                          '/dev/xdebug-trace.php','/dev/db-debug.php'));
 }
 define('FB_DEBUG_INDEX',debug_index());
-if(DEBUG_FB || isset($_REQUEST['debug']) || FB_DEBUG_INDEX)
+define('DEBUG_FB_ST',0);
+if(DEBUG_FB_ST || isset($_REQUEST['debug']) || FB_DEBUG_INDEX)
 {
   if(!isset($_SERVER['HTTP_HOST']) || !in_array($_SERVER['HTTP_HOST'],['phptest.ya0.cn','gocode.ya0.cn','uc.ya0.cn','42.228.4.166']))
   include "main.php";
