@@ -2,7 +2,6 @@
 //require dirname(__FILE__).'/debug/auto_prepend.php';
 date_default_timezone_set("Asia/Shanghai");
 
-define('DEBUG_FB',1);
 define('IS_GBK',0);
 defined('DEBUG_CONSOLE_HIDE');
 //define('DEBUG_CONSOLE_HIDE',1);
@@ -44,7 +43,6 @@ define('DEBUG_FDB_FILE', DEBUG_FDB_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
 define('dg','fb(get_defined_vars());');
 define('DEBUG_REPLAY',isset($_COOKIE['xdebug-replay']));
-define('FB_DEBUG_INDEX',debug_index());
 if(!FB_DEBUG_INDEX)ob_start();
 
 //if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
@@ -250,13 +248,6 @@ function debug_dev_dir()
 	return FB_DEBUG_INDEX || strpos(SGS('REQUEST_URI'), '/debug/')!==false;
 }
 
-function debug_index()
-{
-	if(!defined('FB_DEBUG_MIAN'))define('FB_DEBUG_MIAN',strpos(SGS('HTTP_HOST'), 'debug.')===0 || (isset($_SERVER["REQUEST_URI"]) && in_array($_SERVER['REQUEST_URI'],array('/debug/','/debug/index.php'))));
-	return  FB_DEBUG_MIAN ||
-	in_array($_SERVER['SCRIPT_NAME'],array('/debug/index.php','/debug/dev/xdebug-trace.php','/debug/dev/db-debug.php',
-	                                       '/dev/xdebug-trace.php','/dev/db-debug.php'));
-}
 
 
 function data_cleanup()

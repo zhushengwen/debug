@@ -1,2 +1,2 @@
-@php -r "$file = './auto_prepend.php';$no='if(0)';$yes='if(1)';$content = file_get_contents($file);if(strpos($content,$no)){file_put_contents($file,str_replace($no,$yes,$content));echo '调试已开启';}elseif(strpos($content,$yes)){file_put_contents($file,str_replace($yes,$no,$content));echo '调试已关闭';}"
+@php -r "$file = './auto_prepend.php';$no='define(\'DEBUG_FB\',0);';$yes='define(\'DEBUG_FB\',1);';$content = file_get_contents($file);if(strpos($content,$no)){file_put_contents($file,str_replace($no,$yes,$content));echo '调试已开启';}elseif(strpos($content,$yes)){file_put_contents($file,str_replace($yes,$no,$content));echo '调试已关闭';}"
 @ping -n 6 127.1 >nul
