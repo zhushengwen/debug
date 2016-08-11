@@ -272,7 +272,7 @@ function data_cleanup()
 	}
 	$content = ob_get_contents();
 	if(FB_RECOND_CONTENT && !$dev)fd($content,true);
-	if(DEBUG_REPLAY)
+	if(DEBUG_REPLAY && !FB_DEBUG_INDEX)
 	{
 		ob_end_clean();
 		header('Access-Control-Allow-Origin:*');

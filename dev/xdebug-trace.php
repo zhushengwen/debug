@@ -1,7 +1,7 @@
 <?php
 // PHP debug tools - http://www.gosu.pl/debug/
 // Author: Cezary Tomczak [cagret at gmail.com]
-error_reporting(E_ALL);
+error_reporting(0);
 ini_set("display_errors", 1);
 ini_set('log_errors', 1);
 ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
