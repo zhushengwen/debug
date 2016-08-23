@@ -899,7 +899,6 @@ var rjax = <?php echo $ir_ajax;?>;
 var ajax = <?php echo $is_ajax;?>;
 var method = '<?php echo $re_method;?>';
 var d = '<?php echo $req_data;?>';
-debug_cookie_set('xdebug-replay','1');
 function getUrl(str){
 		var s= str.indexOf('<url>')+5;
 		var e= str.indexOf('</url>');
@@ -1009,12 +1008,6 @@ else{
 </body>
 <script>
 function l(td){console.log(td.title);}
-function debug_cookie_set(name, value)
-{
-    var cookie = (name + '=' + escape(value));
-    cookie += '; path=/';
-    document.cookie = cookie;
-}
 function debug_popup(url, width, height, more)
 {
     if (!width) width = 800;
