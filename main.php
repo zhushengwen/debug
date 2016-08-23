@@ -22,7 +22,8 @@ define('FB_DEBUG_FORCE',1 || !DEBUG_CLI && !DEBUG_FORCE_FAIL && 1 );
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
 define('DEBUG_FB_DIR', dirname(__FILE__));
-define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.'/dev/xdebug-trace.php');
+define('DEBUG_FB_TRACE','/dev/xdebug-trace.php');
+define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.DEBUG_FB_TRACE);
 define('HTTP_HOST',isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']: (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost'));
 define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
 define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST.XDEBUG_TRACE_SCRIPT_PATH);
@@ -43,12 +44,10 @@ define('DEBUG_FDB_ORG', DEBUG_TEMP.'/db-debug.dat');
 define('DEBUG_FDB_FILE', DEBUG_FDB_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
 define('dg','fb(get_defined_vars());');
-define('DEBUG_REPLAY',isset($_COOKIE['xdebug-replay']));
-define('FB_DEBUG_INDEX',debug_index());
+define('DEBUG_REPLAY',strpos(SGS('HTTP_REFERER'),DEBUG_FB_TRACE));
 if(!FB_DEBUG_INDEX)ob_start();
 
 //if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
-if(DEBUG_REPLAY)setcookie("xdebug-replay",null,null,'/');
 function fb_debug_dir()
 {
 	$ret = '/debug';
@@ -267,6 +266,7 @@ function data_cleanup()
 	{
 		ob_end_clean();
 		header('Access-Control-Allow-Origin:*');
+		header('Access-Control-Allow-Headers: X-Requested-With');
 		echo '<url>'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'</url>';exit;
 	}
 	if(!DEBUG_AJAX && DEBUG_FB)
