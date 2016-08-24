@@ -251,7 +251,6 @@ function debug_dev_dir()
 
 function data_cleanup()
 {
-
 	static $called = false;
 	if ($called) return;
 	else $called = true;

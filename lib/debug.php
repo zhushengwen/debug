@@ -7,7 +7,7 @@ ini_set('log_errors', 1);
 ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
 //ini_set('html_errors', 0);
 ini_set('date.timezone', 'Asia/Shanghai');
-register_shutdown_function('data_cleanup');
+register_shutdown_function(function(){register_shutdown_function('data_cleanup');});
 if(FB_DEBUG_ERROR)set_error_handler('debug_error');
 function debug_record()
 {

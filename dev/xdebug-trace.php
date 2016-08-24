@@ -111,8 +111,8 @@ if($xthandle)
 		if ($first_row) { $first_row = false; $prev = $row; continue; }
 
 
-
-		if ('function_exists' == $row['func'] && $row['param'] == "&apos;data_cleanup&apos;")break;
+		if(isset($row['file'])&&strpos($row['file'],'/debug/lib/debug.php'))continue;
+		//if ('function_exists' == $row['func'] && $row['param'] == "&apos;data_cleanup&apos;")break;
 		if ('data_cleanup' == $row['func']) break;
 		if ($row['func'])
 		{
