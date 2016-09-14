@@ -45,6 +45,14 @@ define('DEBUG_FDB_FILE', DEBUG_FDB_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
 define('dg','fb(get_defined_vars());');
 define('DEBUG_REPLAY',strpos(SGS('HTTP_REFERER'),DEBUG_FB_TRACE));
+
+if(DEBUG_REPLAY)
+{
+	header('Access-Control-Allow-Origin:*');
+	header('Access-Control-Allow-Headers: X-Requested-With');
+	if(SGS('REQUEST_METHOD')==='OPTIONS')exit;
+}
+
 if(!FB_DEBUG_INDEX)ob_start();
 
 //if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
@@ -137,6 +145,7 @@ function fl()
 
 function frecord()
 {
+
 	$path = DEBUG_FB_DIR .'/fb.php';
 	if(file_exists($path) && isset($_SERVER['HTTP_USER_AGENT']) && !(strpos($_SERVER['HTTP_USER_AGENT'],'FirePHP') === false)){
 		require_once $path;
@@ -264,9 +273,8 @@ function data_cleanup()
 	if(DEBUG_REPLAY && !FB_DEBUG_INDEX)
 	{
 		ob_end_clean();
-		header('Access-Control-Allow-Origin:*');
-		header('Access-Control-Allow-Headers: X-Requested-With');
-		echo '<url>'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'</url>';exit;
+		exit(DEBUG_AJAX?('<url>'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'</url>'):
+		('<script>var x = (screen.width/2-400);var y = (screen.height/2-325);window.open("'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'", "", "scrollbars=yes,resizable=yes,width=800,height=650,screenX="+(x)+",screenY="+y+",left="+x+",top="+y);</script>'));
 	}
 	if(!DEBUG_AJAX && DEBUG_FB)
 	{

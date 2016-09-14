@@ -919,7 +919,7 @@ if(!ajax){
 		ifm.style.display="none";
 		document.body.appendChild(ifm);
 		var load=function(){
-		debug_popup(getUrl(ifm.contentWindow.document.body.innerHTML));
+		 //debug_popup(getUrl(ifm.contentWindow.document.body.innerHTML));
 		}
 		if(ifm.attachEvent){
 		ifm.attachEvent("onload", load);
@@ -966,7 +966,7 @@ if(p){
 
 }
 else{
-	r.open('GET', l + (d&&l.indexOf('?')==-1?'?':'') + (d&&l.indexOf('&')==l.length-1?'':'&') + d, true);
+	r.open('GET', l + (d&&l.indexOf('?')==-1?'?':'') + (d&&l.lastIndexOf('&')!=l.length-1?'&':'') + d, true);
 	r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 	r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
 	r.send();
