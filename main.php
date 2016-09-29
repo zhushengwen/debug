@@ -273,6 +273,7 @@ function data_cleanup()
 	if(DEBUG_REPLAY && !FB_DEBUG_INDEX)
 	{
 		ob_end_clean();
+		header('HTTP/1.1 200 OK');
 		exit(DEBUG_AJAX?('<url>'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'</url>'):
 		('<script>var x = (screen.width/2-400);var y = (screen.height/2-325);window.open("'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'", "", "scrollbars=yes,resizable=yes,width=800,height=650,screenX="+(x)+",screenY="+y+",left="+x+",top="+y);</script>'));
 	}

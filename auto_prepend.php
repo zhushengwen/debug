@@ -10,6 +10,7 @@ function debug_index()
 }
 define('FB_DEBUG_INDEX',debug_index());
 define('DEBUG_FB_ST',1);
+
 if(DEBUG_FB_ST || isset($_REQUEST['debug']) || FB_DEBUG_INDEX)
 {
   if(!isset($_SERVER['HTTP_HOST']) || !in_array($_SERVER['HTTP_HOST'],['phptest.ya0.cn','gocode.ya0.cn','uc.ya0.cn','42.228.4.166']))
