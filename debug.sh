@@ -15,6 +15,7 @@ curl -o debug.zip -L https://github.com/zhushengwen/debug/archive/master.zip
 unzip -o debug.zip
 rm -rf debug
 mv -f debug-master debug
+rm -rf profile
 mkdir profile
 sed -i "/^auto_prepend_file.*/i\auto_prepend_file = $WEB_ROOT/debug/auto_prepend.php" $phpini
 sed -i "/^auto_prepend_file.*/{ n; d;}" $phpini
