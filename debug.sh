@@ -4,7 +4,7 @@ which php>/dev/null 2>&1; [ $? == 1 ] && echo '未安装php' && exit;
 
 phpini=`php --ini | grep "Loaded Configuration" | sed -e "s|.\+:\s\+||"`
 
-echo phpini;
+echo $phpini;
 #移动调试目录
 echo please input nginx web root:
 read  WEB_ROOT
