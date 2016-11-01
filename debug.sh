@@ -10,7 +10,7 @@ echo $phpini;
 #移动调试目录
 WEB_ROOT=`pwd`
 echo please input nginx web root:
-read  WEB_ROOT
+#read  WEB_ROOT
 
 WEB_ROOT=${WEB_ROOT%*/}
 cd $WEB_ROOT
