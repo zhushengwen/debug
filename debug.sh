@@ -1,11 +1,14 @@
 #!/bin/bash
 
+#curl -s https://raw.githubusercontent.com/zhushengwen/debug/master/debug.sh | bash -s -
+
 which php>/dev/null 2>&1; [ $? == 1 ] && echo '未安装php' && exit;
 
 phpini=`php --ini | grep "Loaded Configuration" | sed -e "s|.\+:\s\+||"`
 
 echo $phpini;
 #移动调试目录
+WEB_ROOT=`pwd`
 echo please input nginx web root:
 read  WEB_ROOT
 
