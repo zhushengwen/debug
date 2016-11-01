@@ -17,6 +17,7 @@ echo WEB_ROOT:$WEB_ROOT
 cd $WEB_ROOT
 curl -o debug.zip -L https://github.com/zhushengwen/debug/archive/master.zip
 unzip -o debug.zip
+rm -rf debug.zip
 rm -rf debug
 mv -f debug-master debug
 rm -rf profile
