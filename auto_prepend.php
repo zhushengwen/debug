@@ -9,7 +9,7 @@ function debug_index()
                                          '/dev/xdebug-trace.php','/dev/db-debug.php'));
 }
 define('FB_DEBUG_INDEX',debug_index());
-define('DEBUG_FB_ST',1);
+define('DEBUG_FB_ST',0);
 
 if(DEBUG_FB_ST || isset($_REQUEST['debug']) || FB_DEBUG_INDEX)
 {

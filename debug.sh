@@ -2,8 +2,8 @@
 
 #curl -s https://raw.githubusercontent.com/zhushengwen/debug/master/debug.sh | bash -s -
 
+export PATH=$PATH:$(dirname `find / -name php -executable -type f | head -1`)
 which php>/dev/null 2>&1; [ $? == 1 ] && echo '未安装php' && exit;
-
 phpini=`php --ini | grep "Loaded Configuration" | sed -e "s|.\+:\s\+||"`
 
 echo $phpini;
@@ -20,6 +20,7 @@ unzip -o debug.zip
 rm -rf debug.zip
 mv -f debug-master/* debug/
 rm -rf debug-master
+chown www:www -R ./debug
 sed -i "/^auto_prepend_file.*/i\auto_prepend_file = $WEB_ROOT/debug/auto_prepend.php" $phpini
 sed -i "/^auto_prepend_file.*/{ n; d;}" $phpini
 
