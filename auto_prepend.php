@@ -13,6 +13,7 @@ define('DEBUG_FB_ST',1);
 
 if(DEBUG_FB_ST || isset($_REQUEST['debug']) || FB_DEBUG_INDEX)
 {
+  define('DEBUG_SHOW_FORCE',1);
   if(!isset($_SERVER['HTTP_HOST']) || !in_array($_SERVER['HTTP_HOST'],['phptest.ya0.cn','gocode.ya0.cn','uc.ya0.cn','42.228.4.166']))
   include "main.php";
 }
