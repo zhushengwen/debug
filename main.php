@@ -10,8 +10,10 @@ define('DEBUG_CLI',PHP_SAPI == 'cli');
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('LOCAL',(isset($_SERVER["REMOTE_ADDR"]) && $_SERVER['REMOTE_ADDR']=="10.0.2.2") ||
 	isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR'])==$_SERVER['REMOTE_ADDR']);
+
+define('DEBUG_FB_DIR', dirname(__FILE__));
 define('DEBUG_DIR', fb_debug_dir());
-define('DEBUG_TEMP',DEBUG_DIR.'/tmp/xtrace' );
+define('DEBUG_TEMP',DEBUG_FB_DIR.'/tmp/xtrace' );
 define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0);
 define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
 define('DEBUG_HIST_FILE',DEBUG_TEMP.'/xdebug-history.html');
@@ -21,7 +23,7 @@ define('FB_DEBUG_FORCE',1 || !DEBUG_CLI && !DEBUG_FORCE_FAIL && 1 );
 
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
-define('DEBUG_FB_DIR', dirname(__FILE__));
+
 define('DEBUG_FB_TRACE','/dev/xdebug-trace.php');
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.DEBUG_FB_TRACE);
 define('HTTP_HOST',isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']: (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost'));
