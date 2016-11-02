@@ -21,7 +21,8 @@ rm -rf debug.zip
 mkdir -p debug
 \cp -rf debug-master/* debug/
 rm -rf debug-master
-chown www:www -R ./debug
+user=`ps aux | grep php-fpm | tail -2 | head -1 | awk '{print $1}'`
+chown $user:$user -R ./debug
 sed -i "/^auto_prepend_file.*/i\auto_prepend_file = $WEB_ROOT/debug/auto_prepend.php" $phpini
 sed -i "/^auto_prepend_file.*/{ n; d;}" $phpini
 
