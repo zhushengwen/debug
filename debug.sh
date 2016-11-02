@@ -18,7 +18,7 @@ cd $WEB_ROOT
 curl -o debug.zip -L https://github.com/zhushengwen/debug/archive/master.zip
 unzip -o debug.zip
 rm -rf debug.zip
-mv -f debug-master/* debug/
+\cp -rf debug-master/* debug/
 rm -rf debug-master
 chown www:www -R ./debug
 sed -i "/^auto_prepend_file.*/i\auto_prepend_file = $WEB_ROOT/debug/auto_prepend.php" $phpini
