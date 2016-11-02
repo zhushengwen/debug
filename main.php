@@ -10,7 +10,7 @@ define('DEBUG_CLI',PHP_SAPI == 'cli');
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('LOCAL',(isset($_SERVER["REMOTE_ADDR"]) && $_SERVER['REMOTE_ADDR']=="10.0.2.2") ||
 	isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR'])==$_SERVER['REMOTE_ADDR']);
-define('DEBUG_DIR', dirname(__FILE__));
+define('DEBUG_DIR', fb_debug_dir());
 define('DEBUG_TEMP',DEBUG_DIR.'/tmp/xtrace' );
 define('DEBUG_COOKIE',isset($_COOKIE['xdebug-trace'])?$_COOKIE['xdebug-trace']:0);
 define('DEBUG_LIST_FILE',DEBUG_TEMP.'/xdebug-trace.html');
@@ -21,7 +21,7 @@ define('FB_DEBUG_FORCE',1 || !DEBUG_CLI && !DEBUG_FORCE_FAIL && 1 );
 
 define('DEBUG_SHOW_FORCE',0);
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
-
+define('DEBUG_FB_DIR', dirname(__FILE__));
 define('DEBUG_FB_TRACE','/dev/xdebug-trace.php');
 define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.DEBUG_FB_TRACE);
 define('HTTP_HOST',isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']: (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost'));
@@ -56,8 +56,24 @@ if(DEBUG_REPLAY)
 if(!FB_DEBUG_INDEX)ob_start();
 
 //if(DEBUG_FB) require dirname(__FILE__).'/phpBugLost.0.2.php';
+function fb_debug_dir()
+{
+	$ret = '/debug';
+	$root = $_SERVER['DOCUMENT_ROOT'];
+	$dir = dirname(__FILE__);
+	$root = str_replace('\\', '/', $root);
+	$dir = str_replace('\\', '/', $dir);
+	if ('/' == substr($root, -1)) { $root = substr($root, 0, -1); }
+	//$root = @preg_replace('#^([a-z])(:[\s\S]+)$#ie', "strtolower('\\1').'\\2'", $root);
+	//$dir = @preg_replace('#^([a-z])(:[\s\S]+)$#ie', "strtolower('\\1').'\\2'", $dir);
+	if ($root == substr($dir, 0, strlen($root))) {
+		$ret = substr($dir, strlen($root));
+	}
+	return $ret;
+}
 
 function fa($var){echo "<script>console.log(".json_encode($var).")</script>";}
+
 
 function fc($var){
 //.mt_rand(1000,9999)
@@ -130,7 +146,7 @@ function fl()
 function frecord()
 {
 
-	$path = DEBUG_DIR .'/fb.php';
+	$path = DEBUG_FB_DIR .'/fb.php';
 	if(file_exists($path) && isset($_SERVER['HTTP_USER_AGENT']) && !(strpos($_SERVER['HTTP_USER_AGENT'],'FirePHP') === false)){
 		require_once $path;
 	}
