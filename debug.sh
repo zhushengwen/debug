@@ -55,6 +55,6 @@ xdebug.collect_return = Off
 ;xdebug.profiler_enable=On
 xdebug.profiler_output_name="cachegrind.out.%t.%R"
 xdebug.profiler_enable_trigger=1
-xdebug.profiler_output_dir="$WEB_ROOT/profile"
+xdebug.profiler_output_dir="$WEB_ROOT/tmp/profile"
 !
 )
