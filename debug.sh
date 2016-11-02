@@ -18,6 +18,7 @@ cd $WEB_ROOT
 curl -o debug.zip -L https://github.com/zhushengwen/debug/archive/master.zip
 unzip -o debug.zip
 rm -rf debug.zip
+mkdir -p debug
 \cp -rf debug-master/* debug/
 rm -rf debug-master
 chown www:www -R ./debug
