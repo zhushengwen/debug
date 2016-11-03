@@ -9,31 +9,31 @@ phpini=`php --ini | grep "Loaded Configuration" | sed -e "s|.\+:\s\+||"`
 echo $phpini;
 #移动调试目录
 WEB_ROOT=`pwd`
-echo please input nginx web root:
+#echo please input nginx web root:
 #read  WEB_ROOT
 
 WEB_ROOT=${WEB_ROOT%*/}
 echo WEB_ROOT:$WEB_ROOT
 cd $WEB_ROOT
-curl -o debug.zip -L https://github.com/zhushengwen/debug/archive/master.zip
-unzip -o debug.zip
-rm -rf debug.zip
-mkdir -p debug
-\cp -rf debug-master/* debug/
-rm -rf debug-master
+curl -o ./debug.zip -L https://github.com/zhushengwen/debug/archive/master.zip
+unzip -o ./debug.zip
+rm -rf ./debug.zip
+mkdir -p ./debug
+\cp -rf ./debug-master/* ./debug/
+rm -rf ./debug-master
 user=`ps aux | grep php-fpm | tail -2 | head -1 | awk '{print $1}'`
 chown $user:$user -R ./debug
 sed -i "/^auto_prepend_file.*/i\auto_prepend_file = $WEB_ROOT/debug/auto_prepend.php" $phpini
 sed -i "/^auto_prepend_file.*/{ n; d;}" $phpini
 
-[ -z "`php -m | grep runkit`" ] && pecl install runkit && (cat <<! >> $phpini
+[ -z "`php -m | grep runkit`" ] && pecl install runkit >/dev/null && (cat <<! >> $phpini
 [runkit]
 extension=runkit.so
 runkit.internal_override = On
 !
 )
 
-[ -z "`php -m | grep xdebug`" ] && pecl install xdebug && (cat <<! >> $phpini
+[ -z "`php -m | grep xdebug`" ] && pecl install xdebug >/dev/null && (cat <<! >> $phpini
 [xdebug]
 zend_extension=xdebug.so
 xdebug.default_enable = 1
@@ -41,7 +41,7 @@ xdebug.remote_connect_back = 0
 xdebug.idekey = "PHPSTORM"
 
 xdebug.remote_enable = On
-;xdebug.remote_host="10.0.2.2"
+xdebug.remote_host="10.0.2.2"
 xdebug.remote_port = 9001
 xdebug.remote_handler = "dbgp"
 xdebug.remote_autostart=1
