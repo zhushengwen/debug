@@ -19,8 +19,6 @@ WEB_ROOT=${WEB_ROOT%*/}
 echo WEB_ROOT:$WEB_ROOT
 cd $WEB_ROOT
 
-#保存原来的配置文件
-[ ! -f $WEB_ROOT/tmp/php.ini ] && cp $phpini $WEB_ROOT/tmp/php.ini
 
 #下载调试文件
 curl -o ./debug.zip -L https://github.com/zhushengwen/debug/archive/master.zip
@@ -29,6 +27,10 @@ rm -rf ./debug.zip
 mkdir -p ./debug
 \cp -rf ./debug-master/* ./debug/
 rm -rf ./debug-master
+
+newini=$WEB_ROOT/debug/tmp/php.ini
+#保存原来的配置文件
+[ ! -f $newini ] && cp $phpini $newini
 
 curl -o ./debug/crudini https://raw.githubusercontent.com/pixelb/crudini/master/crudini
 chmod +x ./debug/crudini
@@ -39,7 +41,7 @@ sed -i "/^auto_prepend_file.*/i\auto_prepend_file = $WEB_ROOT/debug/auto_prepend
 sed -i "/^auto_prepend_file.*/{ n; d;}" $phpini
 
 [ -z "`php -m | grep runkit`" ] && pecl install runkit
-[ ! -z "`php -m | grep runkit`" ] && (cat <<! >> ./debug/crudini --merge $phpini
+[ -z "`php -m | grep runkit`" ] && (cat <<! >> ./debug/crudini --merge $phpini
 [runkit]
 extension=runkit.so
 runkit.internal_override = On
@@ -47,7 +49,7 @@ runkit.internal_override = On
 )
 
 [ -z "`php -m | grep xdebug`" ] && pecl install xdebug
-[ ! -z "`php -m | grep xdebug`" ] && (cat <<! >> ./debug/crudini --merge $phpini
+[ -z "`php -m | grep xdebug`" ] && (cat <<! >> ./debug/crudini --merge $phpini
 [xdebug]
 zend_extension=xdebug.so
 xdebug.default_enable = 1
