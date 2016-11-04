@@ -25,8 +25,8 @@ newini=$WEB_ROOT/debug/tmp/php.ini
 
 [ -f $newini ] && \cp -f $newini $phpini
 
-[ -f ./debug/tmp/.runkit ] && pecl uninstll runkit
-[ -f ./debug/tmp/.xdebug ] && pecl uninstll xdebug
+[ -f ./debug/tmp/.runkit ] && pecl uninstall runkit
+[ -f ./debug/tmp/.xdebug ] && pecl uninstall xdebug
 
 rm -rf $WEB_ROOT/debug
 
