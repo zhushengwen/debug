@@ -41,7 +41,7 @@ sed -i "/^auto_prepend_file.*/i\auto_prepend_file = $WEB_ROOT/debug/auto_prepend
 sed -i "/^auto_prepend_file.*/{ n; d;}" $phpini
 
 [ -z "`php -m | grep runkit`" ] && pecl install runkit
-[ -z "`php -m | grep runkit`" ] && (cat <<! >> ./debug/crudini --merge $phpini
+[ -z "`php -m | grep runkit`" ] && (./debug/crudini --merge $phpini <<!
 [runkit]
 extension=runkit.so
 runkit.internal_override = On
@@ -49,7 +49,7 @@ runkit.internal_override = On
 )
 
 [ -z "`php -m | grep xdebug`" ] && pecl install xdebug
-[ -z "`php -m | grep xdebug`" ] && (cat <<! >> ./debug/crudini --merge $phpini
+[ -z "`php -m | grep xdebug`" ] && (./debug/crudini --merge $phpini <<!
 [xdebug]
 zend_extension=xdebug.so
 xdebug.default_enable = 1
