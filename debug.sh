@@ -7,6 +7,9 @@ which php>/dev/null 2>&1; [ $? == 1 ] && echo '未安装php' && exit;
 phpini=`php --ini | grep "Loaded Configuration" | sed -e "s|.\+:\s\+||"`
 
 echo $phpini;
+#检查配置文件是否存在
+[ ! -f $phpini ] && echo '未找到php.ini' && exit;
+
 #移动调试目录
 WEB_ROOT=`pwd`
 #echo please input nginx web root:
@@ -15,25 +18,36 @@ WEB_ROOT=`pwd`
 WEB_ROOT=${WEB_ROOT%*/}
 echo WEB_ROOT:$WEB_ROOT
 cd $WEB_ROOT
+
+#保存原来的配置文件
+[ ! -f $WEB_ROOT/tmp/php.ini ] && cp $phpini $WEB_ROOT/tmp/php.ini
+
+#下载调试文件
 curl -o ./debug.zip -L https://github.com/zhushengwen/debug/archive/master.zip
 unzip -o ./debug.zip
 rm -rf ./debug.zip
 mkdir -p ./debug
 \cp -rf ./debug-master/* ./debug/
 rm -rf ./debug-master
+
+curl -o ./debug/crudini https://raw.githubusercontent.com/pixelb/crudini/master/crudini
+chmod +x ./debug/crudini
+
 user=`ps aux | grep php-fpm | tail -2 | head -1 | awk '{print $1}'`
 chown $user:$user -R ./debug
 sed -i "/^auto_prepend_file.*/i\auto_prepend_file = $WEB_ROOT/debug/auto_prepend.php" $phpini
 sed -i "/^auto_prepend_file.*/{ n; d;}" $phpini
 
-[ -z "`php -m | grep runkit`" ] && pecl install runkit && (cat <<! >> $phpini
+[ -z "`php -m | grep runkit`" ] && pecl install runkit
+[ ! -z "`php -m | grep runkit`" ] && (cat <<! >> ./debug/crudini --merge $phpini
 [runkit]
 extension=runkit.so
 runkit.internal_override = On
 !
 )
 
-[ -z "`php -m | grep xdebug`" ] && pecl install xdebug && (cat <<! >> $phpini
+[ -z "`php -m | grep xdebug`" ] && pecl install xdebug
+[ ! -z "`php -m | grep xdebug`" ] && (cat <<! >> ./debug/crudini --merge $phpini
 [xdebug]
 zend_extension=xdebug.so
 xdebug.default_enable = 1
