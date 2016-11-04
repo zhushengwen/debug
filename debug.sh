@@ -77,4 +77,6 @@ xdebug.profiler_enable_trigger=1
 xdebug.profiler_output_dir="$WEB_ROOT/tmp/profile"
 !
 )
+rm -f ./debug/crudini
+
 service php-fpm restart
