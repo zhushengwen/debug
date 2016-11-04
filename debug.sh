@@ -2,6 +2,8 @@
 
 #curl -s https://raw.githubusercontent.com/zhushengwen/debug/master/debug.sh | bash -s -
 
+[ ! -z "${BASH_SOURCE[0]}" ] && cd $(dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ))
+
 export PATH=$(dirname `find / -name php -executable -type f | head -1`):$PATH
 which php>/dev/null 2>&1; [ $? == 1 ] && echo '未安装php' && exit;
 phpini=`php --ini | grep "Loaded Configuration" | sed -e "s|.\+:\s\+||"`
