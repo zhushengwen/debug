@@ -28,6 +28,6 @@ newini=$WEB_ROOT/debug/tmp/php.ini
 [ -f ./debug/tmp/.runkit ] && pecl uninstll runkit
 [ -f ./debug/tmp/.xdebug ] && pecl uninstll xdebug
 
-rm -f $WEB_ROOT/debug
+rm -rf $WEB_ROOT/debug
 
 service php-fpm restart
