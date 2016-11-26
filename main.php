@@ -24,10 +24,12 @@ define('FB_DEBUG_FORCE',1 || !DEBUG_CLI && !DEBUG_FORCE_FAIL && 1 );
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
 
 define('DEBUG_FB_TRACE','/dev/xdebug-trace.php');
-define('HTTP_HOST',isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']: (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost'));
-define('XDEBUG_HTTP_HOST_BASE', 'http://'.HTTP_HOST.DEBUG_DIR);
-//define('XDEBUG_HTTP_HOST_BASE', 'http://debug.***.com');
-define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST_BASE.DEBUG_FB_TRACE);
+define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.DEBUG_FB_TRACE);
+define('HTTP_HOST',DEBUG_HOST?:(isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']: 
+       (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:
+	'localhost')));
+define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
+define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST.XDEBUG_TRACE_SCRIPT_PATH);
 define('XDEBUG_TIME',(microtime(1)*10000).rand(1000,9999));
 define('XDEBUG_TIME_REAL',intval(XDEBUG_TIME/100000000));
 define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
@@ -39,7 +41,7 @@ define('DEBUG_FDB',FB_DEBUG_FORCE || (DEBUG_FB && LOCAL));
 define('FB_DEBUG_ERROR', 0);
 define('FB_RECOND_CONTENT',FB_DEBUG_FORCE);
 
-define('DEBUG_FDB_SCRIPT', XDEBUG_HTTP_HOST_BASE.'/dev/db-debug.php');
+define('DEBUG_FDB_SCRIPT', XDEBUG_HTTP_HOST.DEBUG_DIR.'/dev/db-debug.php');
 define('DEBUG_FDB_SCRIPT_TIME', DEBUG_FDB_SCRIPT.'?time='.XDEBUG_TIME);
 define('DEBUG_FDB_ORG', DEBUG_TEMP.'/db-debug.dat');
 define('DEBUG_FDB_FILE', DEBUG_FDB_ORG.'.'.XDEBUG_TIME);
@@ -156,8 +158,8 @@ function frecord()
 		eval('function fb($var){fa($var);}');
 	}
 	$fb_data = array('method'=>(DEBUG_AJAX?'ajax_':'').SGS('REQUEST_METHOD'),
-	                 'uri'=>XDEBUG_HTTP_HOST.SGS('REQUEST_URI'),
-	                 'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
+		'uri'=>XDEBUG_HTTP_HOST.SGS('REQUEST_URI'),
+		'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
 	define('FB_HIST_LOG',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" title="'.SGS('REMOTE_ADDR').'" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.SGS('REQUEST_METHOD').':'.SGS('REQUEST_URI').'</a>('.SGS("HTTP_HOST").'-<a target="_blank" href="https://www.baidu.com/s?wd='.SGS('REMOTE_ADDR').'" ><font color="darkblue">'.SGS('REMOTE_ADDR').'</font></a>)<br/>');
 	if(!FB_DEBUG_INDEX)file_put_contents(DEBUG_HIST_FILE,file_exists(DEBUG_HIST_FILE)?FB_HIST_LOG.file_get_contents(DEBUG_HIST_FILE):'');
 	if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && !debug_index())
@@ -276,7 +278,7 @@ function data_cleanup()
 		ob_end_clean();
 		header('HTTP/1.1 200 OK');
 		exit(DEBUG_AJAX?('<url>'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'</url>'):
-		('<script>var x = (screen.width/2-400);var y = (screen.height/2-325);window.open("'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'", "", "scrollbars=yes,resizable=yes,width=800,height=650,screenX="+(x)+",screenY="+y+",left="+x+",top="+y);</script>'));
+			('<script>var x = (screen.width/2-400);var y = (screen.height/2-325);window.open("'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'", "", "scrollbars=yes,resizable=yes,width=800,height=650,screenX="+(x)+",screenY="+y+",left="+x+",top="+y);</script>'));
 	}
 	if(!DEBUG_AJAX && DEBUG_FB)
 	{
