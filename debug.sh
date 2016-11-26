@@ -34,7 +34,6 @@ newini=$WEB_ROOT/debug/tmp/php.ini
 #保存原来的配置文件
 [ ! -f $newini ] && cp $phpini $newini
 
-curl -o ./debug/crudini https://raw.githubusercontent.com/pixelb/crudini/master/crudini
 chmod +x ./debug/crudini
 
 user=`ps aux | grep php-fpm | tail -2 | head -1 | awk '{print $1}'`
