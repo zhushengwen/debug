@@ -58,9 +58,7 @@ xdebug.remote_connect_back = 0
 xdebug.idekey = "PHPSTORM"
 
 xdebug.remote_enable = On
-xdebug.remote_host="10.0.2.2"
 xdebug.remote_port = 9001
-xdebug.remote_handler = "dbgp"
 xdebug.remote_autostart=1
 
 xdebug.overload_var_dump = 0
