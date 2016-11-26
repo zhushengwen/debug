@@ -20,19 +20,26 @@ define('DEBUG_HIST_FILE',DEBUG_TEMP.'/xdebug-history.html');
 define('DEBUG_FORCE_FAIL',file_exists(DEBUG_LIST_FILE) && time()-filectime(DEBUG_LIST_FILE)>1200);
 
 define('FB_DEBUG_FORCE',1 || !DEBUG_CLI && !DEBUG_FORCE_FAIL && 1 );
-
 define('DEBUG_CONSOLE',LOCAL&&(DEBUG_COOKIE+1)||DEBUG_SHOW_FORCE);
 
-define('DEBUG_FB_TRACE','/dev/xdebug-trace.php');
-define('XDEBUG_TRACE_SCRIPT_PATH',DEBUG_DIR.DEBUG_FB_TRACE);
-define('HTTP_HOST',DEBUG_HOST?:(isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']: 
-       (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:
-	'localhost')));
-define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
-define('XDEBUG_TRACE_SCRIPT', XDEBUG_HTTP_HOST.XDEBUG_TRACE_SCRIPT_PATH);
 define('XDEBUG_TIME',(microtime(1)*10000).rand(1000,9999));
 define('XDEBUG_TIME_REAL',intval(XDEBUG_TIME/100000000));
 define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
+
+define('HTTP_HOST',isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']:
+				   (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost'));
+define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
+define('XDEBUG_WEB_BASE', 'http://'.(defined('DEBUG_HOST')?DEBUG_HOST:HTTP_HOST.DEBUG_DIR));
+define('DEBUG_FB_TRACE','/dev/xdebug-trace.php');
+define('XDEBUG_TRACE_SCRIPT', XDEBUG_WEB_BASE.DEBUG_FB_TRACE);
+
+define('DEBUG_FDB_SCRIPT', XDEBUG_WEB_BASE.'/dev/db-debug.php');
+define('DEBUG_FDB_SCRIPT_TIME', DEBUG_FDB_SCRIPT.'?time='.XDEBUG_TIME);
+define('DEBUG_FDB_ORG', DEBUG_TEMP.'/db-debug.dat');
+define('DEBUG_FDB_FILE', DEBUG_FDB_ORG.'.'.XDEBUG_TIME);
+define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
+define('dg','fb(get_defined_vars());');
+define('DEBUG_REPLAY',strpos(SGS('HTTP_REFERER'),DEBUG_FB_TRACE));
 
 define('AUTO_EXPAND_CONTROLLER',1);
 define('AUTO_FB_COOKIE',0);
@@ -41,13 +48,7 @@ define('DEBUG_FDB',FB_DEBUG_FORCE || (DEBUG_FB && LOCAL));
 define('FB_DEBUG_ERROR', 0);
 define('FB_RECOND_CONTENT',FB_DEBUG_FORCE);
 
-define('DEBUG_FDB_SCRIPT', XDEBUG_HTTP_HOST.DEBUG_DIR.'/dev/db-debug.php');
-define('DEBUG_FDB_SCRIPT_TIME', DEBUG_FDB_SCRIPT.'?time='.XDEBUG_TIME);
-define('DEBUG_FDB_ORG', DEBUG_TEMP.'/db-debug.dat');
-define('DEBUG_FDB_FILE', DEBUG_FDB_ORG.'.'.XDEBUG_TIME);
-define('DEBUG_AJAX',isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
-define('dg','fb(get_defined_vars());');
-define('DEBUG_REPLAY',strpos(SGS('HTTP_REFERER'),DEBUG_FB_TRACE));
+
 
 if(DEBUG_REPLAY)
 {
