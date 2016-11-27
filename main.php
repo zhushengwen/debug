@@ -8,8 +8,7 @@ defined('DEBUG_CONSOLE_HIDE');
 //define('DEBUG_CONSOLE_HIDE',1);
 define('DEBUG_CLI',PHP_SAPI == 'cli');
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
-define('LOCAL',(isset($_SERVER["REMOTE_ADDR"]) && $_SERVER['REMOTE_ADDR']=="10.0.2.2") ||
-	isset($_SERVER["HTTP_HOST"]) && (isset($_SERVER['LOCAL_ADDR'])?$_SERVER['LOCAL_ADDR']:$_SERVER['SERVER_ADDR'])==$_SERVER['REMOTE_ADDR']);
+define('LOCAL',SGS('REMOTE_ADDR')=="10.0.2.2" || (SGS('LOCAL_ADDR')?:SGS('SERVER_ADDR'))===(SGS('REMOTE_ADDR')?:NULL));
 
 define('DEBUG_FB_DIR', dirname(__FILE__));
 define('DEBUG_DIR', fb_debug_dir());
