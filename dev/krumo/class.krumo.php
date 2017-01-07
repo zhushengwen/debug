@@ -662,7 +662,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		// custom selected skin ?
 		//
 		$_ = KRUMO_DIR . "skins/{$skin}/skin.css";
-		if ($fp = @fopen($_, 'r', 1)) {
+		if (file_exists($_)&&$fp = @fopen($_, 'r', 1)) {
 			$css = fread($fp, filesize($_));
 			fclose($fp);
 			}
@@ -905,7 +905,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 			$_recursion_marker = krumo::_marker();
 			(is_object($bee))
 				? @($bee->$_recursion_marker++)
-				: @($bee[$_recursion_marker]++);
+				: @(isset($bee[$_recursion_marker])?($bee[$_recursion_marker]++):0);
 			
 			$_[0][] =& $bee;
 			}
@@ -934,7 +934,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		$_recursion_marker = krumo::_marker();
 		$_r = ($_is_object)
 			? @$data->$_recursion_marker
-			: @$data[$_recursion_marker] ;
+			: @isset($data[$_recursion_marker])?$data[$_recursion_marker]:0 ;
 		$_r = (integer) $_r;
 
 		// recursion detected

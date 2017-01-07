@@ -237,7 +237,7 @@ function formate_class($str)
 	$stack = 0;
 	foreach($splish as $key => $val)
 	{
-		if($key) $retstr .= ";\n".str_repeat("\t",$stack);
+		if($key&&$stack>=0) $retstr .= ";\n".str_repeat("\t",$stack);
 		$lsplish = explode(' { ',$val);
 		foreach($lsplish as $lkey => $lval)
 		{
@@ -245,7 +245,7 @@ function formate_class($str)
 			$rsplish = explode(' }',$lval);
 			foreach($rsplish as $rkey => $rval)
 			{
-				if($rkey){$stack--;$retstr .= "\n".str_repeat("\t",$stack)." }";}
+				if($rkey){$stack--;if($stack>=0)$retstr .= "\n".str_repeat("\t",$stack)." }";}
 				$rval = str_replace("\n","\n".str_repeat("\t",$stack+2),$rval);
 				$retstr .= $rval;
 			}
