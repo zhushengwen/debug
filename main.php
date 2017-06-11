@@ -27,8 +27,9 @@ define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
 
 define('HTTP_HOST',isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']:
 				   (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost'));
-define('XDEBUG_HTTP_HOST', 'http://'.HTTP_HOST);
-define('XDEBUG_WEB_BASE', 'http://'.(defined('DEBUG_HOST')?DEBUG_HOST:HTTP_HOST.DEBUG_DIR));
+define('XDEBUG_HTTP_TYPE', ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://'); 
+define('XDEBUG_HTTP_HOST', XDEBUG_HTTP_TYPE.HTTP_HOST);
+define('XDEBUG_WEB_BASE', XDEBUG_HTTP_TYPE.(defined('DEBUG_HOST')?DEBUG_HOST:HTTP_HOST.DEBUG_DIR));
 define('DEBUG_FB_TRACE','/dev/xdebug-trace.php');
 define('XDEBUG_TRACE_SCRIPT', XDEBUG_WEB_BASE.DEBUG_FB_TRACE);
 
