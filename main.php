@@ -7,7 +7,6 @@ define('IS_GBK',0);
 defined('DEBUG_CONSOLE_HIDE');
 //define('DEBUG_CONSOLE_HIDE',1);
 define('DEBUG_CLI',PHP_SAPI == 'cli');
-define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('LOCAL',SGS('REMOTE_ADDR')=="10.0.2.2" || (SGS('LOCAL_ADDR')?:SGS('SERVER_ADDR'))===(SGS('REMOTE_ADDR')?:NULL));
 
 define('DEBUG_FB_DIR', dirname(__FILE__));

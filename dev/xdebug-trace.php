@@ -8,6 +8,7 @@ ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
 ini_set('date.timezone', 'Asia/Shanghai');
 ini_set('xdebug.overload_var_dump', false);
 set_time_limit(0);
+ini_set('memory_limit', -1);
 $microstart = microtime(1);
 $memorystart = memory_get_usage();
 
@@ -97,7 +98,7 @@ $next_line = rtrim(fgets($xthandle,512));
 $chunked_trace = array();
 if($xthandle)
 {
-	while (!feof($xthandle) && $total_calls < 40000)
+	while (!feof($xthandle))
 	{
 		$line = $next_line;
 		$next_line = rtrim(fgets($xthandle));
