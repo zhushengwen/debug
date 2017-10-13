@@ -188,9 +188,12 @@ function frecord()
 	{
 		if(AUTOD_FB){
 			$_SERVER['set_error_handler']='set_error_handler_back';
-			runkit_function_copy('set_error_handler',$_SERVER['set_error_handler']);
-			runkit_function_redefine('set_error_handler','$fun,$types=E_ALL','$_SERVER["set_error_function"]=$fun;$_SERVER["set_error_no"]=$types;return $_SERVER["set_error_handler"]("fb_error_handler");');
-		}
+				if(!function_exists($_SERVER['set_error_handler']))
+				{
+					runkit_function_copy('set_error_handler',$_SERVER['set_error_handler']);
+					runkit_function_redefine('set_error_handler','$fun,$types=E_ALL','$_SERVER["set_error_function"]=$fun;$_SERVER["set_error_no"]=$types;return $_SERVER["set_error_handler"]("fb_error_handler");');
+				}
+			}
 		$path = dirname(__FILE__).'/lib/debug.php';
 		if(file_exists($path))require_once $path;
 		if(DEBUG_FDB)
