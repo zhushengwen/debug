@@ -26,7 +26,7 @@ define('XDEBUG_XT_FILE', DEBUG_TEMP.'/xdebug-trace.'.XDEBUG_TIME);
 
 define('HTTP_HOST',isset($_SERVER['HTTP_X_FORWARDED_HOST'])? $_SERVER['HTTP_X_FORWARDED_HOST']:
 				   (isset($_SERVER["HTTP_HOST"])?$_SERVER["HTTP_HOST"]:'localhost'));
-define('XDEBUG_HTTP_TYPE', ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://'); 
+define('XDEBUG_HTTP_TYPE', ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://');
 define('XDEBUG_HTTP_HOST', XDEBUG_HTTP_TYPE.HTTP_HOST);
 define('XDEBUG_WEB_BASE', XDEBUG_HTTP_TYPE.(defined('DEBUG_HOST')?DEBUG_HOST:HTTP_HOST.DEBUG_DIR));
 define('DEBUG_FB_TRACE','/dev/xdebug-trace.php');
@@ -100,6 +100,7 @@ function stack()
 
 
 function fb_error_handler($errno, $errstr, $file, $line){
+	if($errstr=='fsockopen(): unable to connect to '.FB_XDEBUG_HOST.':-1 (Connection refused)')return;
 	$map = array(
 		'/data/www/projects/'=>'E:/work/'
 	);
@@ -160,7 +161,7 @@ function frecord()
 	$fb_data = array('method'=>(DEBUG_AJAX?'ajax_':'').SGS('REQUEST_METHOD'),
 		'uri'=>XDEBUG_HTTP_HOST.SGS('REQUEST_URI'),
 		'url'=>"debug_popup('".XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME."')");
-	define('FB_HIST_LOG',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" title="'.SGS('REMOTE_ADDR').'" href="'.XDEBUG_HTTP_HOST.'/debug/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.SGS('REQUEST_METHOD').':'.SGS('REQUEST_URI').'</a>('.SGS("HTTP_HOST").'-<a target="_blank" href="https://www.baidu.com/s?wd='.SGS('REMOTE_ADDR').'" ><font color="darkblue">'.SGS('REMOTE_ADDR').'</font></a>)<br/>');
+	define('FB_HIST_LOG',date('Y-m-d H:i:s',XDEBUG_TIME_REAL).'-'.XDEBUG_TIME_REAL.':<a target="_blank" title="'.SGS('REMOTE_ADDR').'" href="http://debug.zhen22.com/dev/xdebug-trace.php?time='.XDEBUG_TIME.'">'.SGS('REQUEST_METHOD').':'.SGS('REQUEST_URI').'</a>('.SGS("HTTP_HOST").'-<a target="_blank" href="https://www.baidu.com/s?wd='.SGS('REMOTE_ADDR').'" ><font color="darkblue">'.SGS('REMOTE_ADDR').'</font></a>)<br/>');
 	if(!FB_DEBUG_INDEX)file_put_contents(DEBUG_HIST_FILE,file_exists(DEBUG_HIST_FILE)?FB_HIST_LOG.file_get_contents(DEBUG_HIST_FILE):'');
 	if(DEBUG_FB && (DEBUG_COOKIE||FB_DEBUG_FORCE) && !debug_dev_dir() && !debug_index())
 	{
@@ -187,9 +188,9 @@ function frecord()
 	if(DEBUG_FB)
 	{
 		if(AUTOD_FB){
-			$_SERVER['set_error_handler']='set_error_handler_back';
-				if(!function_exists($_SERVER['set_error_handler']))
+				if(!isset($_SERVER['set_error_handler']))
 				{
+					$_SERVER['set_error_handler']='set_error_handler_back';
 					runkit_function_copy('set_error_handler',$_SERVER['set_error_handler']);
 					runkit_function_redefine('set_error_handler','$fun,$types=E_ALL','$_SERVER["set_error_function"]=$fun;$_SERVER["set_error_no"]=$types;return $_SERVER["set_error_handler"]("fb_error_handler");');
 				}

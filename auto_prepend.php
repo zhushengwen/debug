@@ -11,13 +11,14 @@ function debug_index()
 define('FB_DEBUG_INDEX',debug_index());
 define('DEBUG_FB_ST',1);
 define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
+define('FB_XDEBUG_HOST','10.0.2.2:9001');
 
 if(AUTOD_FB)
 {
   $_SERVER['set_error_handler']='set_error_handler_back';
   if(!function_exists($_SERVER['set_error_handler']))
     runkit_function_copy('set_error_handler',$_SERVER['set_error_handler']);
-  runkit_function_redefine('set_error_handler','$error_handler, $error_types=32767','if(!@fsockopen(\'10.0.2.2:9001\'))return $_SERVER[\'set_error_handler\']($error_handler, $error_types);');
+  runkit_function_redefine('set_error_handler','$error_handler, $error_types=32767','if(!@fsockopen(\''.FB_XDEBUG_HOST.'\'))return $_SERVER[\'set_error_handler\']($error_handler, $error_types);');
 }
 
 
