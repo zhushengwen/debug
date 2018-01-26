@@ -1378,7 +1378,7 @@ function debug_console($display=false)
 			$ret .= ' trace ';
 		}
 
-		$ret .= '<a class="'.(DEBUG_COOKIE?'stop':'start').'" href="javascript:void(0)" onclick="if(debug_cookie_get(\'xdebug-trace\')) {this.innerHTML=\'[stop]\'; this.className=\'stop\'; debug_cookie_del(\'xdebug-trace\');debug_cookie_clear(); location.reload();} else {this.innerHTML=\'[start]\'; this.className=\'start\'; debug_cookie_set(\'xdebug-trace\',1);location.reload();}">['.(DEBUG_COOKIE?'stop':'start').']</a>';
+		$ret .= '<a class="'.(DEBUG_COOKIE==2?'start':'stop').'" href="javascript:void(0)" onclick="if(debug_cookie_get(\'xdebug-trace\')!=2) {this.innerHTML=\'[stop]\'; this.className=\'stop\'; debug_cookie_set(\'xdebug-trace\',2);;debug_cookie_clear(); location.reload();} else {this.innerHTML=\'[start]\'; this.className=\'start\'; debug_cookie_set(\'xdebug-trace\',1);location.reload();}">['.(DEBUG_COOKIE==2?'start':'stop').']</a>';
 	}
 	$ret .= "</div>";
 	$ret .= '</div>';

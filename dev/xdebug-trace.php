@@ -300,9 +300,9 @@ function parse_line($line)
 	}
 
 	$row = $rowtpl;
-	static $call_skip = false;
-	if($tabs[5] == 'fb_error_handler'){$call_skip=true;return;}
-    if($call_skip){if($tabs[5] ==  'file_put_contents')$call_skip = false;return;}
+	//static $call_skip = false;
+	//if($tabs[5] == 'fb_error_handler'){$call_skip=true;return;}
+   // if($call_skip){if($tabs[5] ==  'file_put_contents')$call_skip = false;return;}
 	static $call_id = 0;
 	$call_id++;
 
