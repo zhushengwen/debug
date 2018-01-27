@@ -15,7 +15,7 @@ define('AUTOD_FB',in_array('runkit',get_loaded_extensions()));
 define('FB_XDEBUG_HOST','10.0.2.2:9001');
 //define('FB_DEBUG_SERVER','http://debug.xxxx.com');
 
-if(AUTOD_FB)
+if(AUTOD_FB && 0)
 {
   $_SERVER['set_error_handler']='set_error_handler_back';
   if(!function_exists($_SERVER['set_error_handler']))
