@@ -8,7 +8,11 @@ ini_set('error_log', DEBUG_TEMP.'/!phperror.log');
 //ini_set('html_errors', 0);
 ini_set('date.timezone', 'Asia/Shanghai');
 register_shutdown_function(function(){register_shutdown_function('data_cleanup');});
-if(FB_DEBUG_ERROR)set_error_handler('debug_error');
+if(FB_DEBUG_ERROR)
+{
+	$_SERVER['FB_DEBUG_ERROR']='debug_error';
+	set_error_handler($_SERVER['FB_DEBUG_ERROR']);
+}
 function debug_record()
 {
 	foreach($GLOBALS as $k => $v)
