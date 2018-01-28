@@ -21,7 +21,7 @@ define('DEBUG_FORCE_FAIL', file_exists(DEBUG_LIST_FILE) && time() - filectime(DE
 define('FB_DEBUG_FORCE',! DEBUG_CLI && ! DEBUG_FORCE_FAIL);
 
 define('DEBUG_SHOW_FORCE',0);
-define('LOCAL', SGS('REMOTE_ADDR') == "10.0.2.2"
+define('LOCAL', TRUE || SGS('REMOTE_ADDR') == "10.0.2.2"
 		|| (SGS('LOCAL_ADDR') ?: SGS('SERVER_ADDR')) === (SGS('REMOTE_ADDR') ?: NULL));
 define('DEBUG_CONSOLE', LOCAL && (DEBUG_COOKIE + 1) || DEBUG_SHOW_FORCE);
 
@@ -130,7 +130,7 @@ function fb_error_handler($errno, $errstr, $file, $line)
 		return;
 	}
 	$map  = array(
-		'/data/www/projects/' => 'E:/work/',
+		//'/data/www/projects/' => 'E:/work/',
 	);
 	$file = str_replace(array_keys($map), array_values($map), $file);
 	static $ec = 0;
