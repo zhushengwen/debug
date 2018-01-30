@@ -5,7 +5,7 @@ date_default_timezone_set("Asia/Shanghai");
 define('DEBUG_FB', 1);
 define('IS_GBK', 0);
 defined('DEBUG_CONSOLE_HIDE');
-//define('DEBUG_CONSOLE_HIDE',1);
+//define('DEBUG_CONSOLE_HIDE',0);
 define('DEBUG_CLI', PHP_SAPI == 'cli');
 
 define('DEBUG_FB_DIR', dirname(__FILE__));
@@ -397,6 +397,7 @@ function data_cleanup()
 	{
 		ob_end_clean();
 		header('HTTP/1.1 200 OK');
+		header('Content-Type:text/html;');
 		exit(DEBUG_AJAX
 			? ('<url>'.XDEBUG_TRACE_SCRIPT.'?time='.XDEBUG_TIME.'</url>')
 			:

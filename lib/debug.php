@@ -1349,7 +1349,7 @@ function debug_console($display=false)
 
 	$php_time = number_format(microtime(true) - DEBUG_CONSOLE_TIME - $mysql_time, 2);
 	$mysql_time = $mysql_time ? number_format($mysql_time, 2) : 'none';
-	$hide = DEBUG_COOKIE == -1?'show':'hide';
+	$hide = XDEBUG_STARTED == -1?'show':'hide';
 	$ret = "<div class='debug_console' id='DebugConsole'>";
 	$ret .= "<div>php: $php_time";
 	if ($_SERVER['FB_DATA'] || $Db) $ret .= " - mysql: $mysql_time ";
@@ -1382,7 +1382,7 @@ function debug_console($display=false)
 			$ret .= ' trace ';
 		}
 
-		$ret .= '<a class="'.(DEBUG_COOKIE==2?'start':'stop').'" href="javascript:void(0)" onclick="if(debug_cookie_get(\'xdebug-trace\')!=2) {this.innerHTML=\'[stop]\'; this.className=\'stop\'; debug_cookie_set(\'xdebug-trace\',2);;debug_cookie_clear(); location.reload();} else {this.innerHTML=\'[start]\'; this.className=\'start\'; debug_cookie_set(\'xdebug-trace\',1);location.reload();}">['.(DEBUG_COOKIE==2?'start':'stop').']</a>';
+		$ret .= '<a class="'.(defined('XDEBUG_STARTED')?'stop':'start').'" href="javascript:void(0)" onclick="if(debug_cookie_get(\'xdebug-trace\')!=2) {this.innerHTML=\'[stop]\'; this.className=\'stop\'; debug_cookie_set(\'xdebug-trace\',2);;debug_cookie_clear(); location.reload();} else {this.innerHTML=\'[start]\'; this.className=\'start\'; debug_cookie_set(\'xdebug-trace\',1);location.reload();}">['.(defined('XDEBUG_STARTED')?'stop':'start').']</a>';
 	}
 	$ret .= "</div>";
 	$ret .= '</div>';
@@ -1499,7 +1499,7 @@ function fb_debug_start()
 	if ($called) return;
 	else $called = true;
 
-	if (function_exists('xdebug_start_trace') && (DEBUG_COOKIE || FB_DEBUG_FORCE) ) {
+	if (function_exists('xdebug_start_trace') && FB_DEBUG_FORCE) {
 		ini_set('xdebug.collect_includes', 1);
 		xdebug_start_trace(XDEBUG_XT_FILE, 2);
 		define('XDEBUG_STARTED', 1);
