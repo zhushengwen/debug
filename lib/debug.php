@@ -1349,7 +1349,7 @@ function debug_console($display=false)
 
 	$php_time = number_format(microtime(true) - DEBUG_CONSOLE_TIME - $mysql_time, 2);
 	$mysql_time = $mysql_time ? number_format($mysql_time, 2) : 'none';
-	$hide = XDEBUG_STARTED == -1?'show':'hide';
+	$hide = DEBUG_COOKIE == -1?'show':'hide';
 	$ret = "<div class='debug_console' id='DebugConsole'>";
 	$ret .= "<div>php: $php_time";
 	if ($_SERVER['FB_DATA'] || $Db) $ret .= " - mysql: $mysql_time ";

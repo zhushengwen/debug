@@ -905,6 +905,7 @@ function getUrl(str){
 		var e= str.indexOf('</url>');
 		return str.substring(s,e);
 }
+debug_cookie_set('xdebug-redo',1);
 if(!ajax){
 	if(!window.replay_form)
 	{
@@ -943,35 +944,39 @@ if(!ajax){
 		    	}
 	    }
 	}
-	replay_form.submit();return;
+	replay_form.submit();
 	}
-var p = <?php echo $is_post;?>;
-var x = '<?php echo $xmlr_data;?>';
-var r = new(self.XMLHttpRequest||ActiveXObject)("Microsoft.XMLHTTP");
-r.onreadystatechange = function() {
-	if (r.readyState == 4 && r.status == 200){
-		debug_popup(getUrl(r.responseText));
+	else {
+	var p = <?php echo $is_post;?>;
+	var x = '<?php echo $xmlr_data;?>';
+	var r = new(self.XMLHttpRequest||ActiveXObject)("Microsoft.XMLHTTP");
+	r.onreadystatechange = function() {
+		if (r.readyState == 4 && r.status == 200){
+			debug_popup(getUrl(r.responseText));
+		}
 	}
-}
-if(p){
-	r.open('POST', l, true);
-	if(x){
-		if(rjax)r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-		r.setRequestHeader("Content-Type","application/text/xml; charset=UTF-8");
-		r.send(x);
-	}else{
-	r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-	r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
-	r.send(d);
-	}
+	if(p){
+		r.open('POST', l, true);
+		if(x){
+			if(rjax)r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+			r.setRequestHeader("Content-Type","application/text/xml; charset=UTF-8");
+			r.send(x);
+		}else{
+			r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+			r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
+			r.send(d);
+		}
 
+	}
+	else{
+		r.open('GET', l + (d&&l.indexOf('?')==-1?'?':'') + (d&&l.lastIndexOf('&')!=l.length-1?'&':'') + d, true);
+		r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+		r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
+		r.send();
+	}
+	debug_cookie_del('xdebug-redo');
 }
-else{
-	r.open('GET', l + (d&&l.indexOf('?')==-1?'?':'') + (d&&l.lastIndexOf('&')!=l.length-1?'&':'') + d, true);
-	r.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-	r.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
-	r.send();
-}
+
 
 }
 </script>
@@ -1020,6 +1025,11 @@ function debug_popup(url, width, height, more)
    		window.fb_trace = r;
    	else window.fb_db = r;
     return r;
+}
+function debug_cookie_set(name, value)
+{
+	var cookie = name + '=' + escape(value) + '; path=/';
+	document.cookie = cookie;
 }
 function debug_cookie_del(name, path)
 {

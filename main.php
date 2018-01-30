@@ -47,7 +47,7 @@ define('DEBUG_FDB_ORG', DEBUG_TEMP.'/db-debug.dat');
 define('DEBUG_FDB_FILE', DEBUG_FDB_ORG.'.'.XDEBUG_TIME);
 define('DEBUG_AJAX', isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
 define('dg', 'fb(get_defined_vars());');
-define('DEBUG_REPLAY', strpos(SGS('HTTP_REFERER'), DEBUG_FB_TRACE));
+define('DEBUG_REPLAY', strpos(SGS('HTTP_REFERER'), DEBUG_FB_TRACE) && isset($_COOKIE['xdebug-redo']));
 
 define('AUTO_EXPAND_CONTROLLER', 1);
 define('AUTO_FB_COOKIE_COUNT', AUTO_FB_COOKIE?10:0);
@@ -63,6 +63,7 @@ if (DEBUG_REPLAY)
 	{
 		exit;
 	}
+	c_c('xdebug-redo');
 }
 
 if ( ! FB_DEBUG_INDEX)
