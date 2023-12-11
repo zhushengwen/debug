@@ -1359,12 +1359,12 @@ function debug_console($display=false)
 	{
 		$err = DEBUG_TEMP.'/xdebug-error.'.XDEBUG_TIME.'.html';
 		if(file_exists($err)){
-			$ret .= '<a target="_blank" href="'.XDEBUG_HTTP_HOST.DEBUG_DIR.'/?timeouterr='.XDEBUG_TIME.'">Error</a> - ';
+			$ret .= '<a target="_blank" href="'.XDEBUG_HTTP_HOST.DEBUG_DIR.'/index.php?timeouterr='.XDEBUG_TIME.'">Error</a> - ';
 		}
-		$ret .= '<a title="look history" target="_blank" href="'.XDEBUG_HTTP_HOST.DEBUG_DIR.'/?hist">hist</a> - ';
+		$ret .= '<a title="look history" target="_blank" href="'.XDEBUG_HTTP_HOST.DEBUG_DIR.'/index.php?hist">hist</a> - ';
 		$log = DEBUG_TEMP.'/'.XDEBUG_TIME_REAL.'.log';
 		if(file_exists($log)){
-			$ret .= '<a target = "_blank" href = "'.XDEBUG_HTTP_HOST.DEBUG_DIR.'/?timelog='.XDEBUG_TIME_REAL.'" > Log</a> - ';
+			$ret .= '<a target = "_blank" href = "'.XDEBUG_HTTP_HOST.DEBUG_DIR.'/index.php?timelog='.XDEBUG_TIME_REAL.'" > Log</a> - ';
 		}
 	}
 
